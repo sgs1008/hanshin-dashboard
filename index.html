@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한신공영㈜ 주요 재무정보</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   한신공영㈜ 주요 재무정보 — Apple Style
+   FIX: --gold 정의, td-hs 정의, selPeers 초기화,
+        기본 선택 로직, 로고 정확히 수정
+═══════════════════════════════════════ */
+:root{
+  --bg:#f2f2f7;
+  --bg2:#ffffff;
+  --bg3:#f8f8fb;
+  --card:#ffffff;
+  --card2:#f7f7f9;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.05);
+  /* 브랜드 */
+  --hs-green:#4a8c3f;
+  --hs-blue:#1e5aa8;
+  --gold:#c88b00;          /* ★ FIX: 미정의 변수 추가 */
+  /* 포인트 */
+  --blue:#0071e3;
+  --blue2:#0077ed;
+  --teal:#00a693;
+  --coral:#ff3b30;
+  --amber:#ff9500;
+  --purple:#5856d6;
+  --green:#34c759;
+  /* 텍스트 */
+  --text:#1d1d1f;
+  --text2:#6e6e73;
+  --text3:#aeaeb2;
+  /* 그림자 */
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.07),0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.10),0 4px 12px rgba(0,0,0,0.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','SF Pro Display','Malgun Gothic',sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── LOGIN ── */
+#loginWrap{
+  position:fixed;inset:0;
+  background:linear-gradient(145deg,#f0f4ff 0%,#f2f2f7 40%,#e8f5e9 100%);
+  display:flex;align-items:center;justify-content:center;z-index:9999;
+}
+.lp{
+  width:420px;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.9);
+  border-radius:22px;
+  padding:44px 40px;
+  text-align:center;
+  box-shadow:var(--shadow-lg),0 0 0 1px rgba(0,0,0,0.04);
+}
+.lp-ci{margin:0 auto 18px;display:flex;justify-content:center;}
+.lp-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.4px;}
+.lp-sub{font-size:12px;color:var(--text2);margin-bottom:24px;letter-spacing:.2px;}
+.lp-menus{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.lp-m{
+  background:rgba(255,255,255,0.7);
+  border:1px solid var(--border);
+  border-radius:12px;padding:12px 10px;text-align:center;
+  transition:all .2s ease;cursor:default;
+}
+.lp-m:hover{background:#fff;box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+.lp-mi{font-size:17px;margin-bottom:4px;}
+.lp-mn{font-size:11.5px;font-weight:600;color:var(--text);letter-spacing:-.2px;}
+.lp-md{font-size:10px;color:var(--text2);margin-top:1px;}
+.lp-hr{border:none;border-top:1px solid var(--border);margin-bottom:16px;}
+.lp-lb{font-size:12px;color:var(--text2);text-align:left;margin-bottom:7px;font-weight:500;}
+.lp-in{
+  width:100%;padding:12px 14px;
+  background:rgba(255,255,255,0.9);
+  border:1.5px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:14px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  font-family:inherit;
+}
+.lp-in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,0.12);}
+.lp-btn{
+  width:100%;padding:13px;margin-top:10px;
+  background:var(--blue);
+  color:#fff;font-size:15px;font-weight:600;
+  border:none;border-radius:10px;cursor:pointer;
+  transition:all .15s ease;letter-spacing:-.2px;
+  font-family:inherit;
+}
+.lp-btn:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,113,227,0.3);}
+.lp-btn:active{transform:translateY(0);}
+.lp-err{color:var(--coral);font-size:12px;margin-top:8px;display:none;}
+.lp-lock{margin-top:16px;font-size:11px;color:var(--text3);}
+
+/* ── HEADER ── */
+#app{display:none;}
+header{
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid rgba(0,0,0,0.09);
+  height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;position:sticky;top:0;z-index:200;
+}
+.hbrand{display:flex;align-items:center;gap:0;}
+.h-ci{display:flex;align-items:center;}
+.h-divider{width:1px;height:22px;background:var(--border);margin:0 14px;}
+.h-subtitle{font-size:12px;color:var(--text2);line-height:1.4;}
+.h-subtitle strong{display:block;font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.2px;}
+nav{display:flex;gap:1px;margin-left:20px;}
+.nb{
+  padding:6px 13px;border-radius:8px;font-size:13px;font-weight:500;
+  border:none;cursor:pointer;background:transparent;color:var(--text2);
+  transition:all .15s ease;white-space:nowrap;letter-spacing:-.1px;
+}
+.nb:hover{background:rgba(0,0,0,0.05);color:var(--text);}
+.nb.on{background:rgba(0,113,227,0.1);color:var(--blue);font-weight:600;}
+.logout{
+  padding:5px 13px;background:transparent;
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);font-size:12px;cursor:pointer;transition:.15s;
+  font-family:inherit;
+}
+.logout:hover{border-color:var(--coral);color:var(--coral);}
+
+/* 모바일 햄버거 */
+.mob-menu-btn{
+  display:none;padding:6px 10px;background:transparent;
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);font-size:16px;cursor:pointer;
+}
+.mob-nav{
+  display:none;position:fixed;top:54px;left:0;right:0;
+  background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);z-index:199;padding:10px;
+  flex-direction:column;gap:4px;
+}
+.mob-nav.open{display:flex;}
+.mob-nb{
+  padding:10px 14px;border-radius:8px;font-size:14px;font-weight:500;
+  border:none;cursor:pointer;background:transparent;color:var(--text2);
+  text-align:left;transition:.15s;
+}
+.mob-nb:hover{background:rgba(0,0,0,0.05);color:var(--text);}
+.mob-nb.on{background:rgba(0,113,227,0.1);color:var(--blue);font-weight:600;}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1380px;margin:0 auto;padding:28px;}
+.page{display:none;}
+.page.on{display:block;}
+.ph{margin-bottom:24px;}
+.ph h2{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.5px;}
+.ph p{font-size:13px;color:var(--text2);margin-top:4px;letter-spacing:-.1px;}
+
+/* ── TABS ── */
+.ptabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.ptab{
+  padding:7px 16px;border-radius:20px;font-size:12.5px;font-weight:500;
+  border:1.5px solid var(--border);cursor:pointer;background:var(--bg2);
+  color:var(--text2);transition:all .15s ease;
+}
+.ptab:hover{border-color:rgba(0,113,227,0.3);color:var(--blue);background:#fff;}
+.ptab.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+.stabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.stab{
+  padding:6px 14px;border-radius:18px;font-size:12.5px;font-weight:500;
+  border:1.5px solid var(--border);cursor:pointer;background:var(--bg2);
+  color:var(--text2);transition:all .15s ease;
+}
+.stab:hover{border-color:rgba(0,113,227,0.3);color:var(--blue);background:#fff;}
+.stab.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;}
+
+/* ── KPI CARDS ── */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:20px;}
+.kcard{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:18px;transition:all .2s ease;
+  box-shadow:var(--shadow-sm);
+}
+.kcard:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.kl{font-size:11.5px;color:var(--text2);font-weight:500;margin-bottom:8px;letter-spacing:.1px;}
+.kv{font-size:24px;font-weight:700;color:var(--text);line-height:1;margin-bottom:7px;letter-spacing:-.8px;}
+.kv.t{color:var(--teal);}.kv.r{color:var(--coral);}.kv.b{color:var(--blue);}
+.kbadge{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;
+}
+.up{background:rgba(52,199,89,0.1);color:#1b8a3c;}
+.dn{background:rgba(255,59,48,0.1);color:#c0392b;}
+.nt{background:rgba(110,110,115,0.1);color:var(--text2);}
+
+/* ── CHARTS ── */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:14px;margin-bottom:18px;}
+.ccard{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;box-shadow:var(--shadow-sm);
+}
+.ctitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;letter-spacing:-.2px;}
+.csub{font-size:11px;color:var(--text2);margin-bottom:16px;}
+.cwrap{position:relative;width:100%;height:225px;}
+
+/* ── TABLE ── */
+.tcard{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;margin-bottom:18px;overflow-x:auto;
+  box-shadow:var(--shadow-sm);
+}
+.tcard h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;letter-spacing:-.2px;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:820px;}
+th{
+  padding:9px 10px;text-align:right;font-weight:600;color:var(--text2);
+  font-size:11px;border-bottom:1.5px solid var(--border);background:var(--bg3);
+  letter-spacing:.1px;
+}
+th:first-child,th:nth-child(2){text-align:left;}
+td{
+  padding:8px 10px;text-align:right;
+  border-bottom:1px solid var(--border2);color:var(--text);white-space:nowrap;
+}
+td:first-child{text-align:left;font-weight:600;color:var(--text);}
+td:nth-child(2){text-align:left;color:var(--text2);}
+tr:hover td{background:rgba(0,113,227,0.03);}
+.tg{color:#1b8a3c;font-weight:500;}
+.tr{color:#c0392b;font-weight:500;}
+.tm{color:var(--text2);font-style:italic;}
+.tp{color:var(--purple);font-weight:500;}
+
+/* ── INSIGHT ── */
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px;margin-bottom:18px;}
+.icard{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px;border-left:3px solid var(--blue);box-shadow:var(--shadow-sm);
+}
+.icard.r{border-left-color:var(--coral);}
+.icard.t{border-left-color:var(--teal);}
+.icard h4{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.icard p{font-size:12px;color:var(--text2);line-height:1.65;}
+
+/* ── HISTORY TABLE ── */
+.hist-table-wrap{overflow-x:auto;}
+.hist-table{border-collapse:collapse;font-size:11.5px;white-space:nowrap;min-width:1100px;width:100%;}
+.hist-table th{
+  padding:8px 9px;text-align:center;font-weight:600;color:var(--text2);
+  font-size:11px;border-bottom:1.5px solid var(--border);background:var(--bg3);
+}
+.hist-table th:first-child,.hist-table th:nth-child(2){text-align:left;}
+.hist-table td{
+  padding:8px 9px;text-align:right;
+  border-bottom:1px solid var(--border2);color:var(--text);
+}
+.hist-table td:first-child{text-align:left;font-weight:600;color:var(--text);}
+.hist-table td:nth-child(2){text-align:left;color:var(--text2);font-size:11px;}
+.hist-table tr:hover td{background:rgba(0,113,227,0.03);}
+.hg{color:#1b8a3c;font-weight:500;}
+.hr2{color:#c0392b;font-weight:500;}
+.hm{color:var(--text3);}
+.hist-note{
+  font-size:11px;color:var(--text2);margin-top:10px;line-height:1.8;
+  padding:10px 14px;background:rgba(0,113,227,0.04);
+  border-radius:8px;border-left:3px solid rgba(0,113,227,0.2);
+}
+
+/* ── FIN NOTE ── */
+.fn{
+  background:rgba(0,113,227,0.05);
+  border:1px solid rgba(0,113,227,0.15);
+  border-radius:10px;padding:11px 15px;font-size:12px;
+  color:#0055b3;margin-bottom:18px;line-height:1.6;
+}
+
+/* ── PEER ── */
+/* ★ FIX: .td-hs 클래스 정의 */
+.td-hs{color:var(--hs-blue) !important;font-weight:700 !important;}
+.peer-chk{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border-radius:18px;font-size:12px;font-weight:500;
+  border:1.5px solid var(--border);cursor:pointer;background:var(--bg2);
+  color:var(--text2);transition:.15s;user-select:none;
+}
+.peer-chk:hover{border-color:rgba(0,113,227,0.3);color:var(--blue);}
+.peer-chk.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+.peer-chk.hs{background:rgba(30,90,168,0.08);border-color:var(--hs-blue);color:var(--hs-blue);pointer-events:none;}
+.peer-chk.hs.on{background:var(--hs-blue);border-color:var(--hs-blue);color:#fff;}
+.peer-rank{font-size:10px;opacity:.7;}
+.td-rank{color:var(--text2);font-size:11px;}
+
+/* ── 경영변천사 그룹명 색 ── */
+.hist-g-label{color:var(--gold);font-weight:600;}   /* ★ FIX */
+
+footer{
+  text-align:center;padding:22px;font-size:11px;color:var(--text3);
+  border-top:1px solid var(--border);margin-top:28px;letter-spacing:.3px;
+}
+
+@media(max-width:900px){
+  .cgrid{grid-template-columns:1fr;}
+  header{padding:0 14px;}
+  nav{display:none;}
+  .mob-menu-btn{display:flex;align-items:center;}
+  .wrap{padding:14px;}
+  .kgrid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="loginWrap">
+  <div class="lp">
+    <!-- CI 정밀측정 기반 (원본 비율 그대로)
+         원본: 좌녹 w=77 h=151 / 마름모 w=156 h=153(정마름모) / 우녹 w=33 h=151
+         좌gap=35 / 우gap=79
+         수직중심 동일 (녹색·마름모 y중심 일치)
+         scale: 원본÷3.8 → 좌녹 w=20 h=40 / 마름모 w=41 h=41 / 우녹 w=9 h=40
+         좌gap=9 / 우gap=21
+         배치: 좌녹x=0~20 | gap9 | 마름모cx=20+9+20.5=49.5,cy=21 | gap21 | 우녹x=49.5+20.5+21=91~100
+         전체 CI=100, 높이=42
+    -->
+    <div class="lp-ci">
+      <!-- 좌녹 w=20 h=40 / 마름모 w=h=41 / gap=9 / 우녹 w=20 h=40
+           배치: 좌녹 x=0~20 | gap9 | 마름모 cx=49.5 | gap9 | 우녹 x=79~99 -->
+      <svg width="270" height="52" viewBox="0 0 270 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- 좌측 녹색: w=20, h=40, y=6 -->
+        <rect x="0" y="6" width="20" height="40" rx="2" fill="#4a8c3f"/>
+        <!-- 파란 정마름모: w=h=41, cx=49.5, cy=26, 좌우±20.5, 상하±20.5 -->
+        <polygon points="49.5,5.5 70,26 49.5,46.5 29,26" fill="#1e5aa8"/>
+        <!-- 우측 녹색: w=20, h=40 (좌측과 동일), x=79 -->
+        <rect x="79" y="6" width="20" height="40" rx="2" fill="#4a8c3f"/>
+        <!-- 구분선 -->
+        <line x1="110" y1="10" x2="110" y2="42" stroke="#c0c0c8" stroke-width="0.8"/>
+        <!-- 회사명 -->
+        <text x="118" y="36" font-family="'Apple SD Gothic Neo','Malgun Gothic','나눔고딕',sans-serif" font-size="26" font-weight="800" fill="#1a1a2e" letter-spacing="-1">한신공영</text>
+        <text x="222" y="29" font-family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="500" fill="#444">(주)</text>
+      </svg>
+    </div>
+    <div class="lp-title">주요 재무정보</div>
+    <div class="lp-sub">경영기획실 기획부 &middot; 내부 기밀자료</div>
+    <div class="lp-menus">
+      <div class="lp-m"><div class="lp-mi">📊</div><div class="lp-mn">연도별 생산성</div><div class="lp-md">HCROI 부문별 분석</div></div>
+      <div class="lp-m"><div class="lp-mi">💹</div><div class="lp-mn">한신공영 재무실적</div><div class="lp-md">연간 · 분기 실적</div></div>
+      <div class="lp-m"><div class="lp-mi">🏗️</div><div class="lp-mn">동업타사 경영실적</div><div class="lp-md">피어 비교 분석</div></div>
+      <div class="lp-m"><div class="lp-mi">📅</div><div class="lp-mn">주요 경영변천사</div><div class="lp-md">연혁 타임라인</div></div>
+    </div>
+    <hr class="lp-hr">
+    <div class="lp-lb">비밀번호</div>
+    <input class="lp-in" type="password" id="pwInput" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lp-btn" onclick="doLogin()">로그인</button>
+    <div class="lp-err" id="loginErr">비밀번호가 올바르지 않습니다.</div>
+    <div class="lp-lock">🔒 승인된 임직원만 접근 가능</div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+<header>
+  <div style="display:flex;align-items:center">
+    <div class="hbrand">
+      <div class="h-ci">
+        <!-- 좌녹 w=12 h=24 / 마름모 w=h=25 / gap=6 / 우녹 w=12 h=24 (좌측과 동일)
+             배치: 좌녹 x=0~12 | gap6 | 마름모 cx=30.5 | gap6 | 우녹 x=49~61 -->
+        <svg width="190" height="34" viewBox="0 0 190 34" xmlns="http://www.w3.org/2000/svg">
+          <!-- 좌측 녹색: w=12, h=24, y=5 -->
+          <rect x="0" y="5" width="12" height="24" rx="1.5" fill="#4a8c3f"/>
+          <!-- 파란 정마름모: w=h=25, cx=30.5, cy=17, 좌우±12.5, 상하±12.5 -->
+          <polygon points="30.5,4.5 43,17 30.5,29.5 18,17" fill="#1e5aa8"/>
+          <!-- 우측 녹색: w=12, h=24 (좌측과 동일), x=49 -->
+          <rect x="49" y="5" width="12" height="24" rx="1.5" fill="#4a8c3f"/>
+          <!-- 구분선 -->
+          <line x1="70" y1="7" x2="70" y2="27" stroke="rgba(0,0,0,0.15)" stroke-width="0.7"/>
+          <!-- 회사명 -->
+          <text x="77" y="23" font-family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="17" font-weight="800" fill="#1a1a2e" letter-spacing="-0.6">한신공영</text>
+          <text x="148" y="18" font-family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="10" font-weight="500" fill="#555">(주)</text>
+        </svg>
+      </div>
+      <div class="h-divider"></div>
+      <div class="h-subtitle"><strong>주요 재무정보</strong>경영기획실 기획부</div>
+    </div>
+    <nav>
+      <button class="nb on" onclick="gp('productivity',this)">📊 연도별 생산성</button>
+      <button class="nb" onclick="gp('finance',this)">💹 한신공영 재무실적</button>
+      <button class="nb" onclick="gp('peer',this)">🏗️ 동업타사 경영실적</button>
+      <button class="nb" onclick="gp('history',this)">📅 주요 경영변천사</button>
+    </nav>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="mob-menu-btn" onclick="toggleMobNav()">☰</button>
+    <button class="logout" onclick="doLogout()">로그아웃</button>
+  </div>
+</header>
+
+<!-- 모바일 드롭다운 네비게이션 -->
+<div class="mob-nav" id="mobNav">
+  <button class="mob-nb on" onclick="gp('productivity',this,true)">📊 연도별 생산성</button>
+  <button class="mob-nb" onclick="gp('finance',this,true)">💹 한신공영 재무실적</button>
+  <button class="mob-nb" onclick="gp('peer',this,true)">🏗️ 동업타사 경영실적</button>
+  <button class="mob-nb" onclick="gp('history',this,true)">📅 주요 경영변천사</button>
+</div>
+
+<div class="wrap">
+
+<!-- ══ PAGE 1: 연도별 생산성 ══ -->
+<div class="page on" id="page-productivity">
+  <div class="ph"><h2>연도별 생산성 분석</h2><p>HCROI 모델 기반 부문별 생산성 추이 · 2016–2025 · 단위: 억원 / 배수 (급여대비 지표)</p></div>
+  <div class="stabs" id="pTabs"></div>
+  <div class="kgrid" id="pKpi"></div>
+  <div class="cgrid">
+    <div class="ccard"><div class="ctitle">매출액 추이</div><div class="csub" id="ps1"></div><div class="cwrap"><canvas id="pc1"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">영업이익 추이</div><div class="csub" id="ps2"></div><div class="cwrap"><canvas id="pc2"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">급여대비 매출액 (HCROI)</div><div class="csub" id="ps3"></div><div class="cwrap"><canvas id="pc3"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">급여대비 영업이익 (HCROI)</div><div class="csub" id="ps4"></div><div class="cwrap"><canvas id="pc4"></canvas></div></div>
+  </div>
+  <div class="igrid" id="pIns"></div>
+  <div class="tcard"><h3 id="pTT">데이터 테이블</h3><table id="pTab"></table></div>
+</div>
+
+<!-- ══ PAGE 2: 한신공영 재무실적 ══ -->
+<div class="page" id="page-finance">
+  <div class="ph"><h2>한신공영 재무실적</h2><p>IR자료 기준 · 단위: 억원 / 비율은 %</p></div>
+  <div class="ptabs" id="fTabs">
+    <button class="ptab on" onclick="setFin('y2025',this)">📋 2025년 연간 실적</button>
+    <button class="ptab"    onclick="setFin('q2026',this)">🆕 2026년 1분기 실적</button>
+  </div>
+  <div id="fContent"></div>
+</div>
+
+<!-- ══ PAGE 3: 동업타사 ══ -->
+<div class="page" id="page-peer">
+  <div class="ph"><h2>동업타사 경영실적</h2><p>시공능력순위 50개사 기준 · 별도 손익 / 재무비율 · 단위: 억원 / %</p></div>
+  <div class="ptabs" id="peerTabs">
+    <button class="ptab on" onclick="setPeerPeriod('y2025',this)">2025년 연간 실적</button>
+    <button class="ptab" onclick="setPeerPeriod('q2026q1',this)">2026년 1분기 실적</button>
+  </div>
+  <div class="tcard" style="padding:16px 20px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <h3 style="margin:0;">비교 회사 선택</h3>
+      <div style="display:flex;gap:8px;">
+        <button onclick="peerSelAll(true)" style="padding:4px 12px;font-size:11px;font-weight:600;background:#f5e8c0;color:#7a4a00;border:1px solid #d4a830;border-radius:6px;cursor:pointer;">전체선택</button>
+        <button onclick="peerSelAll(false)" style="padding:4px 12px;font-size:11px;font-weight:600;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:6px;cursor:pointer;">전체해제</button>
+      </div>
+    </div>
+    <div id="peerCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+  </div>
+  <div class="kgrid" id="peerKpi" style="margin-bottom:16px;"></div>
+  <div class="cgrid" id="peerCharts" style="margin-bottom:16px;"></div>
+  <div class="tcard">
+    <h3 id="peerTableTitle">경영실적 비교표</h3>
+    <div style="overflow-x:auto;"><table id="peerTable"></table></div>
+  </div>
+</div>
+
+<!-- ══ PAGE 4: 경영변천사 ══ -->
+<div class="page" id="page-history">
+  <div class="ph"><h2>주요 경영변천사</h2><p>한신공영㈜ 연도별 주요 경영 현황 · 2003–2025 · 출처: 경영기획실 기획부</p></div>
+  <div class="stabs" id="histTabs">
+    <button class="stab on" onclick="setHist('order',this)">📦 수주실적</button>
+    <button class="stab" onclick="setHist('pl',this)">💰 손익현황</button>
+    <button class="stab" onclick="setHist('bs',this)">🏦 재무현황</button>
+    <button class="stab" onclick="setHist('org',this)">🏢 조직현황</button>
+  </div>
+  <div id="histContent"></div>
+</div>
+
+</div><!-- /wrap -->
+<footer>한신공영㈜ 경영기획실 기획부 · 주요 재무정보 · 내부 기밀자료 · 무단 배포 금지</footer>
+</div><!-- /app -->
+
+<script>
+const PW="hs1001000";
+const YRS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+let CH={};
+
+/* ── auth ── */
+function doLogin(){
+  if(document.getElementById("pwInput").value===PW){
+    document.getElementById("loginWrap").style.display="none";
+    document.getElementById("app").style.display="block";
+    init();
+  }else{document.getElementById("loginErr").style.display="block";document.getElementById("pwInput").value="";}
+}
+function doLogout(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("loginWrap").style.display="flex";
+  document.getElementById("pwInput").value="";
+  document.getElementById("loginErr").style.display="none";
+}
+
+function toggleMobNav(){
+  document.getElementById("mobNav").classList.toggle("open");
+}
+
+function gp(id, btn, isMob){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+  document.querySelectorAll(".nb,.mob-nb").forEach(b=>b.classList.remove("on"));
+  document.getElementById("page-"+id).classList.add("on");
+  // 데스크톱 + 모바일 버튼 동기화
+  document.querySelectorAll(".nb,.mob-nb").forEach(b=>{
+    if(b.getAttribute("onclick")&&b.getAttribute("onclick").includes("'"+id+"'")){
+      b.classList.add("on");
+    }
+  });
+  if(isMob) document.getElementById("mobNav").classList.remove("open");
+}
+
+function fmtN(v){return Math.abs(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+
+/* ══════════════════════════════════════
+   생산성 데이터
+══════════════════════════════════════ */
+const PROD={
+  total:{n:"당사 전체",c:"#e8a020",
+    sales:[17688,19679,20632,15411,15003,12918,11906,13112,14762,11136],
+    costR:[92.77,88.97,88.27,89.49,88.57,89.51,90.70,94.47,90.90,87.79],
+    sg:[591,805,548,577,807,885,747,617,839,694],
+    op:[687,1365,1873,1043,908,470,360,108,504,666],
+    sal:[672,728,725,813,771,763,741,684,714,724],
+    hcs:[26.32,27.03,28.46,18.96,19.46,16.93,16.07,19.17,20.68,15.38],
+    hcsg:[0.88,1.11,0.76,0.71,1.05,1.16,1.01,0.90,1.18,0.96],
+    hco:[1.02,1.88,2.58,1.28,1.18,0.62,0.49,0.16,0.71,0.92],
+    p26:{s:11465,o:489,hs:15.84,ho:0.68},
+    ins:["2025년 매출 역대 최저(11,136억) – 자체 분양사업장 준공 및 수주사업장 착공 지연이 주요 원인","원가율 역대 최저(87.8%) 달성 – 원자재 가격 안정화, 2023년 이후 원가율 안정세 지속","영업이익 666억 흑자에도 영업활동 현금흐름 -340억, 수주·기술본부 자금수지 전 본부 적자"]},
+  arch:{n:"건축본부",c:"#4a8c3f",
+    sales:[4135,3957,2649,3190,3722,3072,3278,2255,1000,459],
+    costR:[95.62,96.89,96.45,96.46,91.71,91.86,92.31,89.53,79.10,83.88],
+    sg:[125,116,78,116,220,191,110,77,102,62],
+    op:[56,7,16,-3,90,59,142,159,107,12],
+    sal:[199,210,195,236,238,214,181,118,87,110],
+    hcs:[20.81,18.88,13.59,13.50,15.63,14.35,18.08,19.11,11.49,4.17],
+    hcsg:[0.63,0.55,0.40,0.49,0.93,0.89,0.61,0.65,1.17,0.56],
+    hco:[0.28,0.03,0.08,-0.01,0.38,0.27,0.78,1.35,1.23,0.11],
+    p26:{s:1921,o:-4,hs:25.52,ho:-0.05},
+    ins:["건축공공 2022·2023년 수주 부진으로 2023년부터 매출 큰 폭 감소, 2025년 역대 최저 459억","매출 감소에도 비주관사 현장 정산 효과 등으로 2022년 이후 원가율 크게 개선, 2024년 79.1%","2025년 건축공공 수주 회복에 따라 2026년 매출 1,921억으로 큰 폭 개선 전망(+318.5%)"]},
+  biz:{n:"사업본부",c:"#1a4f9c",
+    sales:[9859,11520,13794,8319,8076,7030,5659,7762,10633,7582],
+    costR:[85.58,83.58,86.14,86.80,85.88,87.30,88.11,101.39,91.29,85.41],
+    sg:[323,532,375,282,379,446,433,372,591,400],
+    op:[1099,1360,1537,816,761,447,240,-482,335,706],
+    sal:[206,240,252,258,239,249,268,295,316,276],
+    hcs:[47.79,48.00,54.83,32.29,33.83,28.29,21.14,26.33,33.64,27.44],
+    hcsg:[1.57,2.21,1.49,1.09,1.59,1.79,1.62,1.26,1.87,1.45],
+    hco:[5.33,5.67,6.11,3.17,3.19,1.80,0.90,-1.63,1.06,2.55],
+    p26:{s:6330,o:425,hs:22.91,ho:1.54},
+    ins:["2023년 영업손실(-482억) 후 기저효과로 이익 회복 중 – 2025년 706억 달성","개발사업 급여대비 영업이익 3.05배 vs 도시정비 0.07배 – 사업부문 간 생산성 격차","자금수지 -690억(2025년) – 준공 미회수 채권 현금화 및 착공일정 관리 시급"]},
+  dev:{n:"개발사업",c:"#2563eb",
+    sales:[9573,10746,12241,7599,7406,5773,4806,6579,9037,6469],
+    costR:[85.53,82.42,85.53,86.55,84.77,86.99,86.52,100.96,91.10,85.14],
+    sg:[295,508,321,264,346,350,315,299,457,261],
+    op:[1090,1381,1450,758,782,401,333,-362,347,700],
+    sal:[199,221,217,230,215,204,210,226,236,197],
+    hcs:[48.20,48.64,56.47,33.08,34.37,28.25,22.91,29.06,38.21,32.84],
+    hcsg:[1.49,2.30,1.48,1.15,1.61,1.71,1.50,1.32,1.93,1.33],
+    hco:[5.49,6.25,6.69,3.30,3.63,1.96,1.59,-1.60,1.47,3.55],
+    p26:{s:4757,o:279,hs:24.15,ho:1.42},
+    ins:["리스크 관리를 위한 시행사업 축소로 2018년 이후 감소 추세","2023·2024년 자체사업 진행으로 증가하였으나 해당사업 준공 이후 지속 감소 추세","자체사업장 준공으로 2026년 매출·영업이익 감소 예상 – 신규 수주 전략 중요"]},
+  urban:{n:"도시정비",c:"#3b82f6",
+    sales:[286,774,1553,720,670,1257,853,1183,1596,1113],
+    costR:[87.06,99.61,90.92,89.44,98.21,88.70,97.07,103.80,92.36,86.97],
+    sg:[28,23,54,18,32,95,119,73,135,139],
+    op:[9,-20,87,58,-20,47,-94,-118,-13,6],
+    sal:[8,19,35,28,23,44,58,68,80,79],
+    hcs:[37.28,40.51,44.62,25.79,28.76,28.47,14.73,17.31,20.06,14.02],
+    hcsg:[3.70,1.21,1.54,0.63,1.39,2.16,2.05,1.07,1.69,1.75],
+    hco:[1.12,-1.06,2.51,2.09,-0.88,1.06,-1.62,-1.73,-0.16,0.07],
+    p26:{s:1573,o:146,hs:19.81,ho:1.84},
+    ins:["지속적인 착공 지연으로 영업손실 반복 발생 – 착공일정 관리가 수익성 핵심","2025년 0.07배로 생산성 저수준, 2026년 착공 확대 시 1.84배로 큰 폭 개선 전망","도시정비사업 착공 관리와 개발사업 신규 수주 전략 병행이 사업본부 핵심 과제"]},
+  civil:{n:"토목본부",c:"#a16207",
+    sales:[3024,3364,3367,3261,2658,2067,2223,2627,2942,2881],
+    costR:[112.83,97.56,91.21,89.73,92.14,92.94,92.71,80.21,94.09,94.97],
+    sg:[107,106,62,142,168,197,176,149,129,210],
+    op:[-495,-24,234,193,41,-51,-14,371,45,-65],
+    sal:[230,235,230,266,247,238,240,236,283,308],
+    hcs:[13.15,14.29,14.66,12.28,10.75,8.70,9.27,11.15,10.41,9.35],
+    hcsg:[0.47,0.45,0.27,0.54,0.68,0.83,0.73,0.63,0.46,0.68],
+    hco:[-2.15,-0.10,1.02,0.73,0.17,-0.22,-0.06,1.57,0.16,-0.21],
+    p26:{s:2902,o:62,hs:9.35,ho:0.20},
+    ins:["2021년 이후 지속적인 상승 추세, 2025년은 전년대비 소폭 감소(2,881억)","2024·2025년 높은 원가율 기록 – 지속적인 설계변경을 통한 원가율 관리 중요","토목사업부문 지속적 영업손실, 구조적 개선 방안 및 자금수지 개선 필요"]},
+  civilpub:{n:"토목공공",c:"#b45309",
+    sales:[2842,3159,3149,3033,2456,1890,1981,2176,2196,1867],
+    costR:[114.18,97.28,90.66,89.19,91.65,92.33,91.97,85.48,93.12,92.18],
+    sg:[100,93,53,83,115,102,82,60,97,81],
+    op:[-503,-7,241,245,90,43,77,256,54,65],
+    sal:[220,223,220,251,237,224,216,201,232,230],
+    hcs:[12.94,14.16,14.34,12.07,10.38,8.43,9.16,10.82,9.46,8.12],
+    hcsg:[0.46,0.42,0.24,0.33,0.49,0.46,0.38,0.30,0.42,0.35],
+    hco:[-2.29,-0.03,1.10,0.98,0.38,0.19,0.36,1.27,0.23,0.28],
+    p26:{s:1788,o:140,hs:7.78,ho:0.61},
+    ins:["토목사업은 토목공공 대비 매출 배수가 높으나 등락 변동폭 큼(비주관사 영향)","토목공공의 경우 소폭이나 흑자 기조 유지 및 소폭 개선 중(0.28배)","선수금 극대화 등 자금수지 개선 필요, 공정율에 따른 기성금 청구 주기 단축"]},
+  civilbiz:{n:"토목사업",c:"#c44b00",
+    sales:[182,205,218,228,202,177,242,451,746,1014],
+    costR:[91.76,101.95,99.08,96.93,98.02,99.44,98.76,54.77,96.92,100.10],
+    sg:[7,14,9,59,52,95,94,88,32,129],
+    op:[8,-18,-7,-52,-48,-94,-91,116,-9,-130],
+    sal:[10,12,10,14,11,13,24,35,51,78],
+    hcs:[17.79,16.83,21.71,15.90,19.01,13.36,10.29,13.07,14.73,12.96],
+    hcsg:[0.72,1.11,0.93,4.14,4.92,7.19,4.01,2.56,0.62,1.65],
+    hco:[0.75,-1.44,-0.74,-3.66,-4.55,-7.12,-3.88,3.35,-0.17,-1.66],
+    p26:{s:1114,o:-78,hs:14.24,ho:-1.00},
+    ins:["토목사업은 지속적인 영업손실로 수익성 개선이 시급한 상황","비주관사 매출 발생에 따라 변동성이 크나 영업이익 구조는 매우 취약","원가율 관리 강화 및 수주전략 재정비, 손익·자금수지를 고려한 수주계획 필요"]},
+  overseas:{n:"해외사업",c:"#6b7280",
+    sales:[618,779,762,584,489,691,703,424,137,162],
+    costR:[95.63,95.76,90.03,91.95,95.09,95.08,98.86,85.14,89.05,91.36],
+    sg:[36,51,34,38,41,51,28,19,18,22],
+    op:[-9,-18,43,10,-16,-16,-20,44,-3,-8],
+    sal:[37,43,49,54,47,47,39,26,20,20],
+    hcs:[16.80,18.23,15.58,10.91,14.72,17.87,16.15,6.97,7.90,7.90],
+    hcsg:[0.97,1.19,0.68,0.70,1.08,0.71,0.74,0.91,1.07,1.07],
+    hco:[-0.23,-0.41,0.88,0.18,-0.35,-0.50,1.67,-0.14,-0.39,-0.39],
+    p26:{s:263,o:-8,hs:12.84,ho:-0.39},
+    ins:["최근 10년간 해외사업 영업이익 평균 0 – 매출액 감소로 영업손실 지속","2022년 기점으로 지속적 하락 추세, 2025년 소폭 증가했으나 수주 확대 필요","지속적인 손실 구조로 인한 사업 재편 필요, 국가별 선별적 수주 전략 수립"]}
+};
+
+const PSECS=["total","arch","biz","dev","urban","civil","civilpub","civilbiz","overseas"];
+const PNAME={total:"당사 전체",arch:"건축본부",biz:"사업본부",dev:"개발사업",urban:"도시정비",civil:"토목본부",civilpub:"토목공공",civilbiz:"토목사업",overseas:"해외사업"};
+let curP="total";
+
+function initProd(){
+  document.getElementById("pTabs").innerHTML=PSECS.map(s=>
+    `<button class="stab${s===curP?" on":""}" onclick="setProd('${s}')">${PNAME[s]}</button>`
+  ).join("");
+  renderProd(curP);
+}
+function setProd(s){
+  curP=s;
+  document.querySelectorAll("#pTabs .stab").forEach(b=>b.classList.toggle("on",b.textContent===PNAME[s]));
+  renderProd(s);
+}
+function renderProd(s){
+  const d=PROD[s],n=9,lv=d.sales[n],lo=d.op[n],lh=d.hco[n],ls=d.hcs[n];
+  document.getElementById("pKpi").innerHTML=[
+    {l:"2025 매출액",v:fmtN(lv)+"억",b:lv-d.sales[n-1],u:"억",c:""},
+    {l:"2025 영업이익",v:(lo<0?"▼ ":"")+fmtN(lo)+"억",b:lo-d.op[n-1],u:"억",c:lo<0?"r":""},
+    {l:"2025 원가율",v:d.costR[n].toFixed(1)+"%",b:-(d.costR[n]-d.costR[n-1]),u:"%p",c:""},
+    {l:"급여대비 매출액",v:ls.toFixed(2)+"배",b:ls-d.hcs[n-1],u:"배",c:"t"},
+    {l:"급여대비 영업이익",v:lh.toFixed(2)+"배",b:lh-d.hco[n-1],u:"배",c:lh<0?"r":""},
+    {l:"2026 매출계획",v:fmtN(d.p26.s)+"억",b:null,x:"사업계획",c:"b"},
+    {l:"2026 영업이익계획",v:(d.p26.o<0?"▼ ":"")+fmtN(Math.abs(d.p26.o))+"억",b:null,x:"사업계획",c:"b"},
+    {l:"총급여(2025)",v:fmtN(d.sal[n])+"억",b:d.sal[n]-d.sal[n-1],u:"억",c:""},
+  ].map(k=>`<div class="kcard"><div class="kl">${k.l}</div><div class="kv ${k.c}">${k.v}</div>${k.b!==null?`<span class="kbadge ${k.b>=0?"up":"dn"}">${k.b>=0?"▲":"▼"} ${Math.abs(k.b).toFixed(1)}${k.u} 전년대비</span>`:`<span class="kbadge nt">${k.x}</span>`}</div>`).join("");
+  ["ps1","ps2","ps3","ps4"].forEach(id=>document.getElementById(id).textContent=d.n+" · 2016-2025");
+  mkLine("pc1",YRS,d.sales,d.c,"억");
+  mkBar("pc2",YRS,d.op);
+  mkLine("pc3",YRS,d.hcs,"#f5b942","배",2);
+  mkLine("pc4",YRS,d.hco,d.c,"배",2);
+  document.getElementById("pIns").innerHTML=d.ins.map((t,i)=>
+    `<div class="icard ${["r","t",""][i]}"><h4>${["📉 주요 이슈","✅ 긍정 요인","⚠️ 핵심 과제"][i]}</h4><p>${t}</p></div>`
+  ).join("");
+  document.getElementById("pTT").textContent=d.n+" 상세 데이터 (2016-2025)";
+  const rows=[
+    {k:"매출액",v:d.sales,f:v=>fmtN(v),c:""},
+    {k:"원가율(%)",v:d.costR,f:v=>v.toFixed(1)+"%",c:v=>v<90?"tg":"tr"},
+    {k:"본사간접비",v:d.sg,f:v=>fmtN(v),c:""},
+    {k:"영업이익",v:d.op,f:v=>fmtN(v),c:v=>v<0?"tr":"tg"},
+    {k:"총급여",v:d.sal,f:v=>fmtN(v),c:""},
+    {k:"급여대비 매출액(배)",v:d.hcs,f:v=>v.toFixed(2),c:"tg"},
+    {k:"급여대비 간접비(배)",v:d.hcsg,f:v=>v.toFixed(2),c:""},
+    {k:"급여대비 영업이익(배)",v:d.hco,f:v=>v.toFixed(2),c:v=>v<0?"tr":"tg"},
+  ];
+  const pm={"매출액":d.p26.s,"영업이익":d.p26.o,"급여대비 매출액(배)":d.p26.hs,"급여대비 영업이익(배)":d.p26.ho};
+  let h=`<tr><th>구분</th>${YRS.map(y=>`<th>${y}</th>`).join("")}<th>평균</th><th style="color:#8b5cf6">2026계획</th></tr>`;
+  rows.forEach(r=>{
+    const avg=r.v.reduce((a,b)=>a+b,0)/r.v.length;
+    const pl=pm[r.k]??null;
+    h+=`<tr><td>${r.k}</td>${r.v.map(v=>{
+      const c=typeof r.c==="function"?r.c(v):r.c;
+      return`<td class="${c}">${r.f(v)}</td>`;
+    }).join("")}<td class="tm">${r.f(avg)}</td><td class="tp">${pl!==null?r.f(pl):"-"}</td></tr>`;
+  });
+  document.getElementById("pTab").innerHTML=h;
+}
+
+/* ══════════════════════════════════════
+   재무 데이터
+══════════════════════════════════════ */
+/* ══════════════════════════════════════
+   재무실적 — IR자료 수치만 사용
+   ① 2025년 IR (연결/별도)
+   ② 2026년 1Q IR (연결/별도)
+══════════════════════════════════════ */
+const FIN={
+  y2025:{
+    con_pl:{yrs:["2024년","2025년"],sales:[14904,11492],costR:[89.94,85.80],sg:[1127,986],op:[373,645],opM:[2.50,5.61],np:[148,579],npM:[0.99,5.04]},
+    con_bs:{yrs:["2024년","2025년"],asset:[23138,22130],cur_asset:[14457,12189],ncur_asset:[8721,9941],debt:[15366,13715],loan:[7812,7407],equity:[7813,8415],equity_cap:[579,579],debtR:[196.66,162.99],highlights:{cash:2751,icR:1.3,curR:141.3,pfGuarantee:997}},
+    sep_pl:{yrs:["2024년","2025년"],sales:[14762,11136],costR:[90.90,87.79],sg:[840,701],op:[504,659],opM:[3.41,5.92],np:[328,343],npM:[2.22,3.08]},
+    sep_bs:{yrs:["2024년","2025년"],asset:[19752,19301],cur_asset:[10547,9007],ncur_asset:[9205,10294],debt:[11837,11010],loan:[4841,5556],equity:[7915,8290],equity_cap:[579,579],debtR:[149.55,132.81],highlights:{cash:2218,icR:1.7,curR:125.5,pfGuarantee:997}},
+    loan_detail:{yrs:["2022","2023","2024","2025"],st_gen:[1820,930,1375,1438],st_cur:[631,1131,1086,894],st_bond:[999,1849,1145,777],st_tot:[3450,3910,3606,3109],lt_gen:[1793,1598,636,1206],lt_bond:[1597,741,599,1241],lt_tot:[3390,2339,1235,2447],total:[6840,6249,4841,5556],pf:[2760,2634,2410,997]},
+    backlog:{total:73098,pub:23714,pub_pct:32.4,priv:49385,priv_pct:67.6,detail:[{name:"공공건축",val:9052,pct:12.4},{name:"공공토목",val:13706,pct:18.7},{name:"해외",val:956,pct:1.3},{name:"민간개발",val:9788,pct:13.4},{name:"도시정비",val:39597,pct:54.2}]},
+    outlook:{sales_yrs:["2026","2027","2028","2029"],sales:[11465,16065,17943,23450],op_yrs:["2025","2026","2027","2028"],op:[680,780,1039,1616]}
+  },
+  q2026:{
+    con_pl:{yrs:["2025년 1Q","2026년 1Q"],sales:[3045,2524],costR:[86.26,86.26],sg:[254,153],op:[165,193],opM:[5.41,7.66],np:[40,123],npM:[1.32,4.88],yoy:{sales:"△17.11%",op:"+17.50%",opM:"+2.26%p",np:"+205.87%",npM:"+3.56%p"}},
+    con_bs:{yrs:["2025년","2026년 1Q"],asset:[22130,22351],cur_asset:[12189,12377],ncur_asset:[9941,9974],debt:[13715,13822],loan:[7407,7305],equity:[8415,8529],equity_cap:[579,579],debtR:[162.99,162.06],highlights:{cash:2262,icR:1.7,curR:130.6,pfGuarantee:839}},
+    sep_pl:{yrs:["2025년 1Q","2026년 1Q"],sales:[2925,2473],costR:[87.83,88.13],sg:[177,117],op:[178,177],opM:[6.10,7.15],np:[94,158],npM:[3.23,6.40],yoy:{sales:"△15.46%",op:"△1.01%",opM:"+1.04%p",np:"+67.68%",npM:"+3.17%p"}},
+    sep_bs:{yrs:["2025년","2026년 1Q"],asset:[19752,19801],cur_asset:[10547,9495],ncur_asset:[9205,10306],debt:[11837,11363],loan:[4841,5538],equity:[7915,8438],equity_cap:[579,579],debtR:[149.55,134.65],highlights:{cash:1917,icR:2.0,curR:116.0,pfGuarantee:839}},
+    loan_detail:{yrs:["2023","2024","2025","2026.1Q"],st_gen:[930,1375,1438,1282],st_cur:[1131,1086,894,1363],st_bond:[1849,1145,777,1072],st_tot:[3910,3606,3109,3717],lt_gen:[1598,636,1206,879],lt_bond:[741,599,1241,972],lt_tot:[2339,1235,2447,1821],total:[6249,4841,5556,5538],pf:[2634,2410,997,839]},
+    backlog:{total:71179,pub:23224,pub_pct:32.6,priv:47955,priv_pct:67.4,detail:[{name:"공공건축",val:8891,pct:12.5},{name:"공공토목",val:13438,pct:18.9},{name:"해외",val:895,pct:1.3},{name:"민간개발",val:8542,pct:12.0},{name:"도시정비",val:39413,pct:55.4}]},
+    ebitda:[{yr:"2023",val:1.9},{yr:"2024",val:3.1},{yr:"2025",val:6.0},{yr:"2026.1Q",val:8.2}],
+    outlook:{sales_yrs:["2026","2027","2028","2029"],sales:[11465,16065,17943,23450],op_yrs:["2026","2027","2028","2029"],op:[680,780,1039,1616]}
+  }
+};
+
+let curF="y2025", curFSub="con";
+
+function setFin(p,btn){
+  curF=p; curFSub="con";
+  document.querySelectorAll("#fTabs .ptab").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  renderFin();
+}
+function setFinSub(sub){
+  curFSub=sub;
+  document.querySelectorAll(".fsub-btn").forEach(b=>b.classList.toggle("on",b.dataset.sub===sub));
+  renderFinDetail();
+}
+function renderFin(){
+  document.getElementById("fContent").innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button class="stab fsub-btn on" data-sub="con" onclick="setFinSub('con')">🔗 연결기준</button>
+      <button class="stab fsub-btn" data-sub="sep" onclick="setFinSub('sep')">📄 별도기준</button>
+    </div>
+    <div id="finDetail"></div>`;
+  renderFinDetail();
+}
+function renderFinDetail(){
+  const el=document.getElementById("finDetail"); if(!el)return;
+  const d=FIN[curF], isCon=curFSub==="con", isY=curF==="y2025";
+  const pl=isCon?d.con_pl:d.sep_pl, bs=isCon?d.con_bs:d.sep_bs, hl=bs.highlights;
+  const label=isCon?"연결기준":"별도기준", L=1;
+
+  /* KPI */
+  const kpis=[
+    {l:"매출액",       v:fmtN(pl.sales[L])+"억",    b:pl.sales[L]-pl.sales[0],   u:"억",  inv:false},
+    {l:"영업이익",     v:fmtN(pl.op[L])+"억",       b:pl.op[L]-pl.op[0],         u:"억",  inv:false,c:"t"},
+    {l:"영업이익률",   v:pl.opM[L].toFixed(2)+"%",   b:pl.opM[L]-pl.opM[0],       u:"%p",  inv:false,c:"t"},
+    {l:"당기순이익",   v:fmtN(pl.np[L])+"억",       b:pl.np[L]-pl.np[0],         u:"억",  inv:false,c:pl.np[L]>=0?"":"r"},
+    {l:"순이익률",     v:pl.npM[L].toFixed(2)+"%",   b:pl.npM[L]-pl.npM[0],       u:"%p",  inv:false},
+    {l:"원가율",       v:pl.costR[L].toFixed(2)+"%", b:pl.costR[L]-pl.costR[0],   u:"%p",  inv:true},
+    {l:"부채비율",     v:bs.debtR[L].toFixed(2)+"%", b:bs.debtR[L]-bs.debtR[0],   u:"%p",  inv:true},
+    {l:"이자보상배율", v:hl.icR.toFixed(1)+"배",     b:null, x:hl.icR>=1?"양호":"주의", c:hl.icR>=1?"t":"r"},
+    {l:"현금성자산",   v:fmtN(hl.cash)+"억",        b:null, x:isY?"25년말":"26년1Q말",c:"b"},
+    {l:"PF보증 잔액",  v:fmtN(hl.pfGuarantee)+"억",b:null, x:"지속 감소",c:""},
+  ];
+  const kpiH=kpis.map(k=>{
+    const up=k.inv?k.b<=0:k.b>=0;
+    return`<div class="kcard"><div class="kl">${k.l}</div><div class="kv ${k.c||""}" style="font-size:20px">${k.v}</div>${k.b!==null?`<span class="kbadge ${up?"up":"dn"}">${up?"▲":"▼"} ${Math.abs(k.b).toFixed(2)}${k.u} 전기비</span>`:`<span class="kbadge nt">${k.x}</span>`}</div>`;
+  }).join("");
+
+  /* 전년동기 배지 */
+  const yoyBadge=!isY&&pl.yoy?`<div class="fn">📊 <b>전년 동기 대비</b> &nbsp; 매출 <b>${pl.yoy.sales}</b> &nbsp;|&nbsp; 영업이익 <b>${pl.yoy.op}</b> &nbsp;|&nbsp; 영업이익률 <b>${pl.yoy.opM}</b> &nbsp;|&nbsp; 순이익 <b>${pl.yoy.np}</b> &nbsp;|&nbsp; 순이익률 <b>${pl.yoy.npM}</b></div>`
+    :`<div class="fn">📌 출처: 한신공영 IR자료 (INVESTOR RELATIONS ${isY?"2024·2025 4Q":"2025·2026 1Q"}) · ${label} · 단위: 억원</div>`;
+
+  /* 손익 테이블 */
+  const plR=[
+    {n:"매출액",    d:pl.sales},
+    {n:"원가율",    d:pl.costR,  fmt:v=>v.toFixed(2)+"%", cls:""},
+    {n:"판관비",    d:pl.sg},
+    {n:"영업이익",  d:pl.op,     cls:v=>v<0?"tr":"tg"},
+    {n:"영업이익률",d:pl.opM,    fmt:v=>v.toFixed(2)+"%", cls:"tg"},
+    {n:"당기순이익",d:pl.np,     cls:v=>v<0?"tr":"tg"},
+    {n:"순이익률",  d:pl.npM,    fmt:v=>v.toFixed(2)+"%", cls:"tg"},
+  ];
+  const plTbl=`<table><tr><th style="text-align:left">손익계산서</th>${pl.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  ${plR.map(r=>`<tr><td>${r.n}</td>${r.d.map(v=>{const c=typeof r.cls==="function"?r.cls(v):r.cls||"";return`<td class="${c}">${(r.fmt||fmtN)(v)}</td>`;}).join("")}</tr>`).join("")}</table>`;
+
+  /* 재무상태표 */
+  const bsR=[
+    {n:"자산 계",    d:bs.asset},
+    {n:"└ 유동자산", d:bs.cur_asset},
+    {n:"└ 비유동",   d:bs.ncur_asset},
+    {n:"부채 계",    d:bs.debt,      cls:"tr"},
+    {n:"└ 차입금",   d:bs.loan},
+    {n:"자본 계",    d:bs.equity,    cls:"tg"},
+    {n:"└ 자본금",   d:bs.equity_cap},
+    {n:"부채비율",   d:bs.debtR,     fmt:v=>v.toFixed(2)+"%", cls:v=>v<150?"tg":v>200?"tr":""},
+  ];
+  const bsTbl=`<table><tr><th style="text-align:left">재무상태표</th>${bs.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  ${bsR.map(r=>`<tr><td>${r.n}</td>${r.d.map(v=>{const c=typeof r.cls==="function"?r.cls(v):r.cls||"";return`<td class="${c}">${(r.fmt||fmtN)(v)}</td>`;}).join("")}</tr>`).join("")}</table>`;
+
+  /* 차입금 */
+  const ld=d.loan_detail;
+  const ldTbl=`<table><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  <tr><td rowspan="4">단기</td><td>일반</td>${ld.st_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td>유동성장기</td>${ld.st_cur.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td>회사채</td>${ld.st_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td><b>소계</b></td>${ld.st_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td rowspan="3">장기</td><td>일반</td>${ld.lt_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td>회사채</td>${ld.lt_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td><b>소계</b></td>${ld.lt_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td colspan="2"><b>합계</b></td>${ld.total.map(v=>`<td class="tg"><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td colspan="2">PF보증</td>${ld.pf.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr></table>`;
+
+  /* 수주잔고 */
+  const bk=d.backlog;
+  const bkH=`<div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:0;">
+    <div class="kcard"><div class="kl">수주잔고 합계</div><div class="kv b" style="font-size:20px">${(bk.total/10000).toFixed(1)}조원</div><span class="kbadge nt">${isY?"25년 공시기준":"26년 1Q 공시"}</span></div>
+    <div class="kcard"><div class="kl">공공</div><div class="kv" style="font-size:18px">${fmtN(bk.pub)}억</div><span class="kbadge nt">${bk.pub_pct}%</span></div>
+    <div class="kcard"><div class="kl">민간</div><div class="kv t" style="font-size:18px">${fmtN(bk.priv)}억</div><span class="kbadge nt">${bk.priv_pct}%</span></div>
+    ${bk.detail.map(x=>`<div class="kcard"><div class="kl">${x.name}</div><div class="kv" style="font-size:16px">${fmtN(x.val)}억</div><span class="kbadge nt">${x.pct}%</span></div>`).join("")}
+  </div>`;
+
+  /* EBITDA (1Q26) */
+  const ebitdaSec=!isY?`<div class="tcard"><h3>EBITDA Margin 추이 (연결기준)</h3>
+    <div class="cgrid" style="grid-template-columns:1fr 1fr;margin-bottom:0;">
+      <table><tr><th style="text-align:left">구분</th>${d.ebitda.map(e=>`<th>${e.yr}</th>`).join("")}</tr>
+      <tr><td>EBITDA Margin</td>${d.ebitda.map(e=>`<td class="tg">${e.val}%</td>`).join("")}</tr></table>
+      <div class="cwrap" style="height:160px;"><canvas id="febitda"></canvas></div>
+    </div>
+    <div class="hist-note">※ 매출 규모 축소에도 EBITDA Margin 지속 개선 — 수익성 중심 체질 개선 실현</div>
+  </div>`:"";
+
+  /* 전망 */
+  const ot=d.outlook;
+  const otTbl=`<table><tr><th style="text-align:left">구분</th>${ot.sales_yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  <tr><td>매출액 전망</td>${ot.sales.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td>영업이익 전망</td>${ot.op.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td>영업이익률</td>${ot.op.map((v,i)=>`<td class="tg">${(v/ot.sales[i]*100).toFixed(1)}%</td>`).join("")}</tr></table>`;
+
+  el.innerHTML=`
+    ${yoyBadge}
+    <div class="kgrid">${kpiH}</div>
+    <div class="cgrid">
+      <div class="ccard"><div class="ctitle">매출액 · 영업이익률</div><div class="csub">${label} · 이중축</div><div class="cwrap"><canvas id="fc1"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">영업이익 · 당기순이익</div><div class="csub">${label} · 억원</div><div class="cwrap"><canvas id="fc2"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">부채비율 추이</div><div class="csub">${label} · %</div><div class="cwrap"><canvas id="fc3"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">${isY?"매출액 전망 (별도)":"영업이익 전망 (별도)"}</div><div class="csub">2026-2029 · 억원</div><div class="cwrap"><canvas id="fc4"></canvas></div></div>
+    </div>
+    <div class="tcard"><h3>손익계산서 (${label})</h3>${plTbl}</div>
+    <div class="tcard"><h3>재무상태표 (${label})</h3>${bsTbl}</div>
+    <div class="tcard"><h3>차입금 및 PF보증 현황 (별도기준)</h3>${ldTbl}</div>
+    <div class="tcard"><h3>수주잔고 현황</h3>${bkH}</div>
+    ${ebitdaSec}
+    <div class="tcard"><h3>향후 년도 전망 (2026-2029) · 별도기준</h3>${otTbl}
+      <div class="hist-note">※ IR자료 기준 · 신규 수주 매년 1.9조원 · 도시정비 착공 본격화(2026년 하반기) 전제</div>
+    </div>`;
+
+  requestAnimationFrame(()=>{
+    mkDual("fc1",pl.yrs,pl.sales,pl.opM);
+    if(CH["fc2"]){CH["fc2"].destroy();delete CH["fc2"];}
+    const c2=document.getElementById("fc2");
+    if(c2) CH["fc2"]=new Chart(c2,{type:"bar",data:{labels:pl.yrs,datasets:[
+      {label:"영업이익",data:pl.op,backgroundColor:pl.op.map(v=>v>=0?"rgba(15,184,170,.7)":"rgba(232,72,90,.7)"),borderRadius:4},
+      {label:"당기순이익",data:pl.np,backgroundColor:pl.np.map(v=>v>=0?"rgba(59,130,246,.6)":"rgba(232,72,90,.6)"),borderRadius:4}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:"#6e6e73",font:{size:11},boxWidth:12}}},scales:{x:GS.x,y:GS.y},animation:{duration:500}}});
+    mkLine("fc3",bs.yrs,bs.debtR,"#e8485a","%",2,80);
+    mkLine("fc4",ot.sales_yrs,isY?ot.sales:ot.op,"#e8a020","억");
+    if(!isY&&document.getElementById("febitda")) mkLine("febitda",d.ebitda.map(e=>e.yr),d.ebitda.map(e=>e.val),"#f5b942","%",1,0);
+  });
+}
+
+/* ══ Chart Helpers ══ */
+const GS={
+  x:{grid:{color:"rgba(0,0,0,0.05)"},ticks:{color:"#6e6e73",font:{size:11}}},
+  y:{grid:{color:"rgba(0,0,0,0.06)"},ticks:{color:"#6e6e73",font:{size:11}}}
+};
+function mkLine(id,lbs,data,color,unit,dec=0,yMin){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"line",
+    data:{labels:lbs,datasets:[{data,borderColor:color,backgroundColor:color+"18",tension:.35,pointRadius:4,pointBackgroundColor:color,borderWidth:2,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.raw.toFixed(dec)+unit}}},
+      scales:{x:GS.x,y:{...GS.y,...(yMin!==undefined?{min:yMin}:{}),ticks:{...GS.y.ticks,callback:v=>v.toFixed(dec)+unit}}},
+      animation:{duration:500}}});
+}
+function mkBar(id,lbs,data){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"bar",
+    data:{labels:lbs,datasets:[{data,backgroundColor:data.map(v=>v>=0?"rgba(15,184,170,.65)":"rgba(232,72,90,.65)"),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.raw.toFixed(0)+"억"}}},
+      scales:{x:GS.x,y:GS.y},animation:{duration:500}}});
+}
+function mkBarCol(id,lbs,data){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"bar",
+    data:{labels:lbs,datasets:[{data,backgroundColor:data.map(v=>v>=0?"rgba(59,130,246,.65)":"rgba(232,72,90,.65)"),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.raw.toFixed(0)+"억"}}},
+      scales:{x:GS.x,y:GS.y},animation:{duration:500}}});
+}
+function mkDual(id,lbs,bar,line){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"bar",
+    data:{labels:lbs,datasets:[
+      {type:"bar",label:"영업이익",data:bar,backgroundColor:bar.map(v=>v>=0?"rgba(15,184,170,.6)":"rgba(232,72,90,.6)"),borderRadius:4,yAxisID:"y"},
+      {type:"line",label:"이익률(%)",data:line,borderColor:"#f5b942",backgroundColor:"transparent",tension:.3,pointRadius:4,pointBackgroundColor:"#f5b942",borderWidth:2,yAxisID:"y2"}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{color:"#6e6e73",font:{size:11},boxWidth:12}},tooltip:{mode:"index"}},
+      scales:{x:GS.x,y:{...GS.y,position:"left"},y2:{...GS.y,position:"right",grid:{display:false},ticks:{...GS.y.ticks,callback:v=>v+"%"}}},
+      animation:{duration:500}}});
+}
+function mkGrp(id,lbs,data,unit,dec=0,yMin){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"bar",
+    data:{labels:lbs,datasets:[{data,backgroundColor:["rgba(90,106,136,.7)","rgba(232,160,32,.8)"],borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.raw.toFixed(dec)+unit}}},
+      scales:{x:GS.x,y:{...GS.y,...(yMin!==undefined?{min:yMin}:{}),ticks:{...GS.y.ticks,callback:v=>v.toFixed(dec)+unit}}},
+      animation:{duration:500}}});
+}
+
+function init(){
+  initProd();
+  renderFin("a");
+  initPeer();
+  setHist('order',document.querySelector('#histTabs .stab'));
+}
+
+/* ══════════════════════════════════════════════
+   주요 경영변천사
+══════════════════════════════════════════════ */
+const HY=[2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+
+const HDATA={
+  order:{
+    title:"연도별 수주실적",sub:"단위: 억원 (부가세 포함)",
+    rows:[
+      {g:"신규수주",n:"합계",u:"억원",d:[14196,8632,17182,15011,10870,13463,20250,13698,11372,17387,11111,20029,24574,14870,19693,20288,13231,22180,23681,19892,16250,22040,20157]},
+      {g:"",n:"├공공(건축)",u:"억원",d:[1037,24,1789,2755,3516,2114,4283,2852,2861,5061,1222,5288,4620,2470,1994,4602,3577,5715,3462,1968,869,3421,4189]},
+      {g:"",n:"├토목",u:"억원",d:[1735,3762,3841,932,4159,3173,6562,4175,1289,2600,2676,3111,4758,-113,3299,1977,1996,387,4731,2486,1530,8726,3017]},
+      {g:"",n:"├개발사업",u:"억원",d:[2718,2379,977,2126,2097,351,670,603,2174,5930,5795,10150,11258,11106,11409,7469,5172,11712,10300,6967,4293,1673,75]},
+      {g:"",n:"├도시정비",u:"억원",d:[8237,2007,10187,8461,11,5539,5964,4028,3439,1746,11,12,1711,100,225,5146,421,3278,4094,7179,8014,7155,11365]},
+      {g:"",n:"└해외",u:"억원",d:[0,13,0,62,294,268,729,1103,0,450,479,603,1318,535,1783,115,535,0,117,131,412,0,637]},
+      {g:"설변·ES",n:"소계",u:"억원",d:[469,447,388,675,793,2018,2042,937,1609,1600,928,865,909,772,983,979,1530,1088,977,1161,1132,1065,874]},
+      {g:"",n:"├건축",u:"억원",d:[28,87,66,32,216,746,666,422,591,30,180,468,114,150,283,189,158,314,147,199,254,53,53]},
+      {g:"",n:"├토목",u:"억원",d:[441,360,322,643,572,1242,1327,481,1018,1516,563,397,725,557,673,676,1299,752,818,962,675,1012,778]},
+      {g:"",n:"└해외",u:"억원",d:[0,0,0,0,5,30,49,34,0,54,185,0,70,65,27,114,73,22,12,0,203,0,43]}
+    ],
+    note:"※ 단위: 억원(부가세 포함) ㆍ 민간 도급증액은 신규수주에 포함 ㆍ 설변=설계변경, ES=Extra Scope"
+  },
+  pl:{
+    title:"연도별 손익현황",sub:"단위: 억원 (개별재무제표 기준, 부가세 제외)",
+    rows:[
+      {g:"매출액",n:"합계",u:"억원",d:[2714,4037,6864,8012,8064,8300,10785,10198,8466,9229,13860,10656,13546,17688,19679,20632,15411,15003,12918,11906,13112,14762,11136]},
+      {g:"",n:"├건축",u:"억원",d:[1746,2660,4852,5714,5331,4954,6295,5990,4659,5254,9921,8020,10537,13994,15477,16443,11509,11798,10102,8937,10017,11633,8041]},
+      {g:"",n:"├토목",u:"억원",d:[883,1279,1981,2265,2609,3068,4150,4119,3664,3560,3404,2148,2329,3024,3364,3367,3261,2658,2067,2223,2627,2942,2881]},
+      {g:"",n:"└해외",u:"억원",d:[0,1,4,6,42,103,300,55,113,389,507,445,626,618,779,762,584,489,691,703,424,137,162]},
+      {g:"원가율",n:"전체",u:"%",fmt:"pct",d:[74.9,85.1,89.1,87.2,88.9,92.8,93.6,92.8,90.8,89.8,91.8,100.4,92.2,92.8,89.0,88.3,89.5,88.6,89.5,90.7,94.5,90.9,87.8]},
+      {g:"",n:"├건축",u:"%",fmt:"pct",d:[76.2,86.1,88.6,84.4,84.3,88.3,89.7,91.2,87.9,86.1,89.4,97.8,89.1,88.5,87.0,87.8,89.5,87.7,88.7,89.6,98.7,90.2,85.3]},
+      {g:"",n:"└토목",u:"%",fmt:"pct",d:[73.9,83.4,90.3,94.3,97.7,100.8,98.8,95.7,94.6,95.1,99.2,105.5,106.5,112.8,97.6,91.2,89.7,92.1,92.9,92.7,80.2,94.1,95.0]},
+      {g:"영업이익",n:"금액",u:"억원",d:[null,null,null,null,null,null,null,null,null,null,null,null,null,687,1365,1873,1043,908,470,360,108,504,666]},
+      {g:"",n:"이익률",u:"%",fmt:"pct",d:[null,null,null,null,null,null,null,null,null,null,null,null,null,3.9,6.9,9.1,6.8,6.1,3.6,3.0,0.8,3.4,6.0]}
+    ],
+    note:"※ 단위: 억원(개별재무제표 기준, 부가세 제외) ㆍ 원가율=매출원가÷매출액×100 ㆍ 영업이익은 2016년부터 표시"
+  },
+  bs:{
+    title:"연도별 재무현황",sub:"단위: 억원 (개별재무제표 기준)",
+    rows:[
+      {g:"자산",n:"유동자산",u:"억원",d:[2657,3726,5089,6497,6747,7211,8359,8722,9934,11810,12345,9181,10422,9653,12040,10752,7962,9269,10951,11459,11144,10547,9264]},
+      {g:"",n:"비유동자산",u:"억원",d:[1137,1006,1061,1083,1562,1763,2913,3114,2943,3069,2781,3663,4591,5470,5518,5583,7095,6683,7596,8513,8454,9205,10039]},
+      {g:"",n:"자산 계",u:"억원",d:[3794,4732,6150,7580,8309,8974,11272,11836,12877,14879,15126,12844,15013,15123,17558,16335,15057,15952,18547,19972,19598,19752,19303]},
+      {g:"부채",n:"유동부채",u:"억원",d:[1396,1958,3118,4068,4172,4813,6204,5806,6340,9361,10015,9200,10556,10729,10035,9153,6410,7147,7380,8462,8762,9548,7162]},
+      {g:"",n:"비유동부채",u:"억원",d:[705,823,852,829,1192,1136,1590,2793,3351,2328,1932,1783,2084,1672,3939,2904,3771,2867,4564,4279,3265,2289,3838]},
+      {g:"",n:"부채 계",u:"억원",d:[2101,2781,3970,4897,5364,5949,7794,8599,9691,11689,11947,10983,12640,12401,13974,12057,10181,10014,11944,12741,12027,11837,11000]},
+      {g:"자본",n:"자본금",u:"억원",d:[496,496,496,496,496,496,496,496,496,496,496,496,496,509,545,579,579,579,579,579,579,579,579]},
+      {g:"",n:"이익잉여금",u:"억원",d:[1553,1602,1673,2180,2435,2546,2937,2690,2652,2653,2635,1246,1454,1656,2407,3078,3647,4688,5221,5739,5953,6229,6559]},
+      {g:"",n:"자본 계",u:"억원",d:[1693,1951,2180,2683,2945,3025,3478,3237,3186,3190,3179,1861,2373,2722,3584,4278,4876,5938,6602,7231,7571,7915,8303]},
+      {g:"재무비율",n:"부채비율",u:"%",fmt:"pct",d:[124.1,142.5,182.1,182.5,182.1,196.7,224.1,265.6,304.2,366.4,375.8,590.2,532.7,455.6,390.0,281.8,208.8,168.6,181.0,176.2,158.9,149.6,132.5]},
+      {g:"",n:"유동비율",u:"%",fmt:"pct",d:[190.3,190.3,163.2,159.7,161.7,149.8,134.7,150.2,156.7,126.2,123.3,99.8,98.7,90.0,119.9,117.5,124.2,129.7,148.4,135.4,127.2,110.5,129.3]},
+      {g:"",n:"이자보상배율",u:"배",fmt:"x",d:[24.3,25.5,12.6,7.7,5.2,2.2,0.4,0.9,0.7,1.0,1.5,-2.4,1.3,3.5,7.0,9.2,4.8,4.0,2.1,2.1,0.3,1.2,1.7]}
+    ],
+    note:"※ 단위: 억원(개별재무제표 기준) ㆍ 부채비율=부채계÷자본계×100 ㆍ 유동비율=유동자산÷유동부채×100 ㆍ 이자보상배율=영업이익÷이자비용"
+  },
+  org:{
+    title:"연도별 조직현황",sub:"단위: 개 / 명 (연도말 기준)",
+    rows:[
+      {g:"직제",n:"실 수",u:"개",d:[1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3]},
+      {g:"",n:"본부 수",u:"개",d:[2,3,3,4,6,6,6,6,7,7,5,5,5,5,5,5,5,5,5,4,4,4,4]},
+      {g:"",n:"임원 수",u:"명",d:[12,12,14,12,17,19,30,30,23,20,20,19,17,15,15,18,17,17,17,13,12,16,13]},
+      {g:"",n:"부 수",u:"개",d:[10,12,16,16,19,20,22,23,22,21,19,19,20,20,20,22,22,22,25,26,24,23,23]},
+      {g:"",n:"연구소·센터",u:"개",d:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]},
+      {g:"해외조직",n:"해외지사",u:"개",d:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,1,1,1,1,1]},
+      {g:"",n:"해외사무소",u:"개",d:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2]}
+    ],
+    note:"※ 연도말 기준 ㆍ 2002년 M&A 이후 집계 ㆍ 직제는 연도말 내부 결재 기준"
+  }
+};
+
+let curHist='order';
+function setHist(key, btn){
+  curHist=key;
+  document.querySelectorAll('#histTabs .stab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  renderHist(key);
+}
+
+function renderHist(key){
+  const el=document.getElementById('histContent');
+  const d=HDATA[key];
+  if(!d){el.innerHTML='';return;}
+
+  const fmtVal=(v,fmt)=>{
+    if(v===null||v===undefined||v==='')return`<span class="hm">–</span>`;
+    if(fmt==='txt') return `<span style="color:var(--text)">${v}</span>`;
+    if(fmt==='pct'){
+      const n=Number(v);
+      const cls=n<0?'hr2':n>=100?'hr2':'';
+      return `<span class="${cls}">${n.toFixed(1)}%</span>`;
+    }
+    if(fmt==='x'){
+      const n=Number(v);
+      const cls=n<0?'hr2':n<1?'hr2':n>=3?'hg':'';
+      return `<span class="${cls}">${n.toFixed(1)}배</span>`;
+    }
+    if(typeof v==='number'){
+      if(v<0) return `<span class="hr2">▼ ${Math.abs(v).toLocaleString('ko-KR')}</span>`;
+      return v.toLocaleString('ko-KR');
+    }
+    return String(v);
+  };
+
+  let chartHTML=`<div class="cgrid" style="margin-bottom:16px;">`;
+  if(key==='order'){
+    chartHTML+=`
+      <div class="ccard"><div class="ctitle">연도별 신규수주 추이</div><div class="csub">2003–2025 · 억원</div><div class="cwrap"><canvas id="hc1"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">부문별 수주 구성</div><div class="csub">스택 바 · 억원</div><div class="cwrap"><canvas id="hc2"></canvas></div></div>`;
+  }else if(key==='pl'){
+    chartHTML+=`
+      <div class="ccard"><div class="ctitle">연도별 매출액</div><div class="csub">2003–2025 · 억원</div><div class="cwrap"><canvas id="hc1"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">원가율 추이</div><div class="csub">2003–2025 · %</div><div class="cwrap"><canvas id="hc2"></canvas></div></div>`;
+  }else if(key==='bs'){
+    chartHTML+=`
+      <div class="ccard"><div class="ctitle">자산·부채·자본 추이</div><div class="csub">2003–2025 · 억원</div><div class="cwrap"><canvas id="hc1"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">부채비율 추이</div><div class="csub">2003–2025 · %</div><div class="cwrap"><canvas id="hc2"></canvas></div></div>`;
+  }else if(key==='org'){
+    chartHTML+=`
+      <div class="ccard"><div class="ctitle">본부·임원 수 추이</div><div class="csub">2003–2025 · 개/명</div><div class="cwrap"><canvas id="hc1"></canvas></div></div>
+      <div class="ccard"><div class="ctitle">부(部) 수 추이</div><div class="csub">2003–2025 · 개</div><div class="cwrap"><canvas id="hc2"></canvas></div></div>`;
+  }
+  chartHTML+=`</div>`;
+
+  let tableHTML=`<div class="hist-table-wrap"><table class="hist-table"><thead><tr>
+    <th style="min-width:68px">구분</th>
+    <th style="min-width:110px">항목</th>
+    <th style="min-width:38px;color:var(--text3);font-size:10px">단위</th>
+    ${HY.map(y=>`<th>${y}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  let lastG='';
+  d.rows.forEach(r=>{
+    const showG=r.g&&r.g!==lastG;
+    if(showG)lastG=r.g;
+    tableHTML+=`<tr>
+      <td>${showG?`<span class="hist-g-label">${r.g}</span>`:''}</td>
+      <td style="color:var(--text2);text-align:left;font-size:11px">${r.n}</td>
+      <td style="color:var(--text3);text-align:center;font-size:10px">${r.u||''}</td>
+      ${r.d.map(v=>fmtVal(v,r.fmt)).map(v=>`<td>${v}</td>`).join('')}
+    </tr>`;
+  });
+  tableHTML+=`</tbody></table></div>`;
+
+  el.innerHTML=`
+    <div class="tcard" style="margin-bottom:16px;">
+      <h3>${d.title} <span style="font-size:11px;font-weight:400;color:var(--text2);margin-left:8px">${d.sub}</span></h3>
+      ${chartHTML}
+      ${tableHTML}
+      <div class="hist-note">${d.note}</div>
+    </div>`;
+
+  requestAnimationFrame(()=>{
+    if(key==='order'){
+      mkLine('hc1',HY,HDATA.order.rows[0].d,'#e8a020','억');
+      mkHistStack('hc2',HY,[
+        {label:'공공건축',data:HDATA.order.rows[1].d,backgroundColor:'rgba(26,79,156,0.75)'},
+        {label:'토목',data:HDATA.order.rows[2].d.map(v=>Math.max(0,v||0)),backgroundColor:'rgba(161,98,7,0.75)'},
+        {label:'개발사업',data:HDATA.order.rows[3].d,backgroundColor:'rgba(59,130,246,0.75)'},
+        {label:'도시정비',data:HDATA.order.rows[4].d,backgroundColor:'rgba(15,184,170,0.75)'},
+        {label:'해외',data:HDATA.order.rows[5].d,backgroundColor:'rgba(107,114,128,0.75)'},
+      ]);
+    }else if(key==='pl'){
+      mkLine('hc1',HY,HDATA.pl.rows[0].d,'#e8a020','억');
+      mkLine('hc2',HY,HDATA.pl.rows[4].d,'#e8485a','%',1,70);
+    }else if(key==='bs'){
+      mkHistStack('hc1',HY,[
+        {label:'부채',data:HDATA.bs.rows[5].d,backgroundColor:'rgba(232,72,90,0.65)'},
+        {label:'자본',data:HDATA.bs.rows[8].d,backgroundColor:'rgba(15,184,170,0.65)'},
+      ]);
+      mkLine('hc2',HY,HDATA.bs.rows[9].d,'#e8485a','%',1,0);
+    }else if(key==='org'){
+      mkDualOrg('hc1',HY,HDATA.org.rows[1].d,HDATA.org.rows[2].d,'본부(개)','임원(명)');
+      mkLine('hc2',HY,HDATA.org.rows[3].d,'#e8a020','개');
+    }
+  });
+}
+
+function mkDualOrg(id,lbs,bar,line,bLbl,lLbl){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:'bar',data:{labels:lbs,datasets:[
+    {type:'bar',label:bLbl||'본부(개)',data:bar.map(v=>v||0),backgroundColor:'rgba(26,79,156,0.65)',borderRadius:4,yAxisID:'y'},
+    {type:'line',label:lLbl||'임원(명)',data:line.map(v=>v||0),borderColor:'#f5b942',backgroundColor:'transparent',tension:.3,pointRadius:3,pointBackgroundColor:'#f5b942',borderWidth:2,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,labels:{color:'#6e6e73',font:{size:11},boxWidth:12}},tooltip:{mode:'index'}},
+    scales:{x:GS.x,y:{...GS.y,position:'left',ticks:{...GS.y.ticks,callback:v=>v+'개'}},y2:{...GS.y,position:'right',grid:{display:false},ticks:{...GS.y.ticks,callback:v=>v+'명'}}},
+    animation:{duration:500}}});
+}
+
+function mkHistStack(id,lbs,datasets){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:'bar',
+    data:{labels:lbs,datasets:datasets.map(ds=>({label:ds.label,data:ds.data,backgroundColor:ds.backgroundColor,borderRadius:2,stack:'s'}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{color:'#6e6e73',font:{size:10},boxWidth:10}},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw.toLocaleString('ko-KR')}억`}}},
+      scales:{x:{...GS.x,stacked:true},y:{...GS.y,stacked:true,ticks:{...GS.y.ticks,callback:v=>v.toLocaleString('ko-KR')}}},
+      animation:{duration:500}}});
+}
+
+/* ══════════════════════════════════════════════
+   동업타사 경영실적
+══════════════════════════════════════════════ */
+const PEER_Y2025=[
+  {rank:2,  name:"현대건설",    isHS:false,sales:165125,costR:94.6,opM:1.5, npM:1.4, ic:3.3,  debt:359.5,cur:173.5,depR:13.7},
+  {rank:3,  name:"대우건설",    isHS:false,sales:71686, costR:98.7,opM:-12.9,npM:-12.5,ic:-5.5,debt:359.5,cur:173.5,depR:30.4},
+  {rank:4,  name:"DL이앤씨",   isHS:false,sales:47501, costR:87.5,opM:4.8, npM:2.1, ic:7.2,  debt:63.5, cur:124.5,depR:6.6},
+  {rank:5,  name:"GS건설",     isHS:false,sales:81002, costR:86.2,opM:5.9, npM:0.5, ic:2.1,  debt:188.9,cur:96.0, depR:29.2},
+  {rank:6,  name:"현대엔지니어링",isHS:false,sales:102078,costR:94.8,opM:-0.8,npM:1.4,ic:-2.0,debt:205.6,cur:123.8,depR:14.2},
+  {rank:7,  name:"포스코이앤씨",  isHS:false,sales:66995, costR:98.2,opM:-7.3,npM:-7.4,ic:-6.2,debt:175.5,cur:151.6,depR:24.3},
+  {rank:8,  name:"롯데건설",    isHS:false,sales:79067, costR:92.8,opM:1.3, npM:0.3, ic:0.6,  debt:189.6,cur:116.8,depR:28.6},
+  {rank:9,  name:"SK에코플랜트",isHS:false,sales:74896, costR:90.8,opM:3.0, npM:0.2, ic:0.9,  debt:198.6,cur:84.9, depR:33.9},
+  {rank:10, name:"HDC현산",    isHS:false,sales:40893, costR:86.1,opM:6.0, npM:4.0, ic:3.5,  debt:120.2,cur:162.2,depR:28.6},
+  {rank:15, name:"계룡건설",   isHS:false,sales:20235, costR:86.8,opM:7.5, npM:5.6, ic:11.0, debt:153.2,cur:133.0,depR:24.0},
+  {rank:16, name:"서희건설",   isHS:false,sales:11076, costR:79.2,opM:13.2,npM:11.1,ic:155.0,debt:38.8, cur:307.1,depR:1.5},
+  {rank:18, name:"코오롱글로벌",isHS:false,sales:26912, costR:91.7,opM:0.5, npM:-7.0,ic:0.2,  debt:312.9,cur:73.1, depR:29.8},
+  {rank:19, name:"태영건설",   isHS:false,sales:19012, costR:95.3,opM:2.1, npM:3.6, ic:1.7,  debt:364.1,cur:106.1,depR:15.7},
+  {rank:20, name:"KCC건설",    isHS:false,sales:18334, costR:84.3,opM:4.8, npM:2.5, ic:3.3,  debt:186.5,cur:115.5,depR:31.0},
+  {rank:24, name:"금호건설",   isHS:false,sales:19639, costR:93.7,opM:2.3, npM:2.2, ic:2.2,  debt:499.4,cur:89.0, depR:11.4},
+  {rank:25, name:"두산건설",   isHS:false,sales:17902, costR:89.1,opM:6.1, npM:0.7, ic:2.5,  debt:541.4,cur:82.3, depR:24.5},
+  {rank:28, name:"동부건설",   isHS:false,sales:16315, costR:88.5,opM:3.7, npM:2.8, ic:4.9,  debt:195.1,cur:120.0,depR:23.1},
+  {rank:29, name:"HL D&I",    isHS:false,sales:16452, costR:87.6,opM:4.1, npM:1.5, ic:1.6,  debt:209.2,cur:116.0,depR:28.4},
+  {rank:37, name:"BS한양",     isHS:false,sales:11342, costR:82.6,opM:10.6,npM:5.4, ic:4.1,  debt:141.5,cur:93.6, depR:28.9},
+  {rank:41, name:"에스지씨이앤씨",isHS:false,sales:9379,costR:93.6,opM:1.2,npM:-7.4,ic:0.4,  debt:217.5,cur:91.9, depR:35.6},
+  {rank:44, name:"진흥기업",   isHS:false,sales:5764,  costR:93.6,opM:-4.0,npM:-4.9,ic:-75.9,debt:133.7,cur:204.3,depR:2.4},
+  {rank:47, name:"HS화성",     isHS:false,sales:4389,  costR:86.5,opM:3.1, npM:4.9, ic:1.5,  debt:67.8, cur:129.3,depR:24.8},
+  {rank:50, name:"서한",       isHS:false,sales:6452,  costR:81.9,opM:9.7, npM:4.5, ic:3.0,  debt:127.0,cur:329.3,depR:38.8},
+  {rank:26, name:"한신공영",   isHS:true, sales:11136, costR:87.8,opM:5.9, npM:3.1, ic:1.7,  debt:132.8,cur:125.5,depR:28.8},
+];
+const PEER_Q2026Q1=[
+  {rank:2,  name:"현대건설",    isHS:false,sales:36130,costR:92.9,opM:2.3, npM:4.5, ic:4.4,  debt:131.9,cur:165.6,depR:13.0},
+  {rank:3,  name:"대우건설",    isHS:false,sales:17204,costR:82.0,opM:12.2,npM:10.5,ic:5.0,  debt:350.1,cur:175.7,depR:32.8},
+  {rank:4,  name:"DL이앤씨",   isHS:false,sales:10404,costR:85.3,opM:6.5, npM:7.5, ic:11.6, debt:66.5, cur:127.0,depR:6.4},
+  {rank:5,  name:"GS건설",     isHS:false,sales:13562,costR:95.5,opM:-0.7,npM:-0.3,ic:-0.2, debt:187.9,cur:80.5, depR:28.4},
+  {rank:6,  name:"현대엔지니어링",isHS:false,sales:22262,costR:91.2,opM:2.5,npM:1.7,ic:2.4,  debt:197.3,cur:122.0,depR:18.1},
+  {rank:7,  name:"포스코이앤씨",  isHS:false,sales:16449,costR:89.9,opM:3.1,npM:2.0,ic:1.9,  debt:175.0,cur:149.2,depR:22.0},
+  {rank:8,  name:"롯데건설",    isHS:false,sales:16006,costR:91.7,opM:3.2, npM:1.8, ic:1.2,  debt:170.2,cur:133.6,depR:31.8},
+  {rank:9,  name:"SK에코플랜트",isHS:false,sales:19630,costR:90.3,opM:5.4, npM:-3.3,ic:1.9,  debt:208.0,cur:78.6, depR:33.1},
+  {rank:10, name:"HDC현산",    isHS:false,sales:6598, costR:81.2,opM:12.2,npM:8.2, ic:4.9,  debt:112.9,cur:177.5,depR:26.7},
+  {rank:15, name:"계룡건설",   isHS:false,sales:4883, costR:86.2,opM:10.0,npM:8.0, ic:19.8, debt:144.9,cur:134.8,depR:25.7},
+  {rank:16, name:"서희건설",   isHS:false,sales:1941, costR:81.9,opM:4.5, npM:9.4, ic:45.0, debt:40.3, cur:274.8,depR:1.4},
+  {rank:18, name:"코오롱글로벌",isHS:false,sales:6288, costR:89.3,opM:3.5, npM:1.9, ic:1.0,  debt:326.7,cur:81.9, depR:29.4},
+  {rank:19, name:"태영건설",   isHS:false,sales:3250, costR:90.5,opM:3.5, npM:4.0, ic:2.2,  debt:337.5,cur:108.2,depR:16.1},
+  {rank:20, name:"KCC건설",    isHS:false,sales:3559, costR:83.0,opM:5.7, npM:4.4, ic:3.5,  debt:163.4,cur:116.3,depR:25.8},
+  {rank:24, name:"금호건설",   isHS:false,sales:4362, costR:92.6,opM:2.6, npM:2.1, ic:4.3,  debt:532.3,cur:89.2, depR:9.2},
+  {rank:25, name:"두산건설",   isHS:false,sales:3594, costR:86.6,opM:8.3, npM:5.6, ic:2.4,  debt:487.9,cur:84.3, depR:21.4},
+  {rank:28, name:"동부건설",   isHS:false,sales:4043, costR:89.2,opM:1.0, npM:2.0, ic:1.3,  debt:197.4,cur:117.6,depR:24.1},
+  {rank:29, name:"HL D&I",    isHS:false,sales:3614, costR:86.8,opM:4.1, npM:1.3, ic:1.5,  debt:231.3,cur:118.5,depR:35.0},
+  {rank:37, name:"BS한양",     isHS:false,sales:3445, costR:77.3,opM:15.6,npM:13.9,ic:7.4,  debt:146.2,cur:103.1,depR:29.9},
+  {rank:41, name:"에스지씨이앤씨",isHS:false,sales:1805,costR:91.9,opM:0.4,npM:6.2,ic:0.1,  debt:215.2,cur:89.7, depR:41.7},
+  {rank:44, name:"진흥기업",   isHS:false,sales:1836, costR:89.4,opM:6.0, npM:5.2, ic:154.1,debt:124.1,cur:217.0,depR:2.4},
+  {rank:47, name:"HS화성",     isHS:false,sales:671,  costR:86.5,opM:0.7, npM:6.8, ic:0.2,  debt:68.1, cur:132.1,depR:25.0},
+  {rank:50, name:"서한",       isHS:false,sales:1053, costR:85.8,opM:5.9, npM:-0.7,ic:1.3,  debt:134.7,cur:276.1,depR:39.2},
+  {rank:26, name:"한신공영",   isHS:true, sales:2473, costR:88.1,opM:7.1, npM:6.4, ic:2.0,  debt:134.6,cur:116.0,depR:28.0},
+];
+
+let curPeerPeriod="y2025";
+let selPeers=new Set();
+
+/* ★ FIX: 기간 전환 시 selPeers 완전 초기화 후 재구성 */
+function setPeerPeriod(p,btn){
+  curPeerPeriod=p;
+  selPeers=new Set(); // 초기화
+  document.querySelectorAll("#peerTabs .ptab").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  initPeer();
+}
+
+function initPeer(){
+  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
+  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+
+  // 한신공영 항상 선택
+  data.filter(d=>d.isHS).forEach(d=>selPeers.add(d.name));
+
+  /* ★ FIX: selPeers가 한신공영만인 경우 기본 선택 추가 (항상 실행) */
+  const defaultRanks=[2,4,5,10,15,29];
+  defaultRanks.forEach(r=>{
+    const d=data.find(x=>x.rank===r);
+    if(d) selPeers.add(d.name);
+  });
+
+  // 체크박스 렌더링
+  const cb=document.getElementById("peerCheckboxes");
+  cb.innerHTML=data.slice().sort((a,b)=>a.rank-b.rank).map(d=>{
+    const on=selPeers.has(d.name);
+    const hsClass=d.isHS?" hs":"";
+    return`<label class="peer-chk${on?" on":""}${hsClass}" onclick="${d.isHS?"":"togglePeer('"+d.name+"',this)"}">
+      <span class="peer-rank">${d.rank}위</span> ${d.name}
+    </label>`;
+  }).join("");
+
+  renderPeer(data,title);
+}
+
+function togglePeer(name,el){
+  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
+  const d=data.find(x=>x.name===name);
+  if(d&&d.isHS)return;
+  if(selPeers.has(name)){selPeers.delete(name);el.classList.remove("on");}
+  else{selPeers.add(name);el.classList.add("on");}
+  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+  renderPeer(data,title);
+}
+
+function peerSelAll(flag){
+  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
+  if(flag){data.forEach(d=>selPeers.add(d.name));}
+  else{selPeers=new Set();data.filter(d=>d.isHS).forEach(d=>selPeers.add(d.name));}
+  document.querySelectorAll("#peerCheckboxes .peer-chk").forEach(el=>{
+    const nm=el.textContent.trim().replace(/\d+위\s*/,"");
+    const d=data.find(x=>x.name===nm);
+    if(d){if(selPeers.has(d.name))el.classList.add("on");else el.classList.remove("on");}
+  });
+  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+  renderPeer(data,title);
+}
+
+function renderPeer(data,title){
+  const sel=data.filter(d=>selPeers.has(d.name)).sort((a,b)=>a.rank-b.rank);
+  const hs=data.find(d=>d.isHS);
+
+  const hsRankOpM=[...data].sort((a,b)=>b.opM-a.opM).findIndex(d=>d.isHS)+1;
+  const hsRankCostR=[...data].sort((a,b)=>a.costR-b.costR).findIndex(d=>d.isHS)+1;
+  const avgOpM=(data.reduce((s,d)=>s+d.opM,0)/data.length).toFixed(1);
+  const avgCostR=(data.reduce((s,d)=>s+d.costR,0)/data.length).toFixed(1);
+  document.getElementById("peerKpi").innerHTML=[
+    {l:"한신공영 매출액",v:fmtN(hs.sales)+"억",sub:hs.rank+"위 (시평)",c:""},
+    {l:"영업이익률",v:hs.opM.toFixed(1)+"%",sub:"조사대상 "+data.length+"사 중 "+hsRankOpM+"위",c:"t"},
+    {l:"원가율",v:hs.costR.toFixed(1)+"%",sub:"전체 평균 "+avgCostR+"%",c:""},
+    {l:"순이익률",v:hs.npM.toFixed(1)+"%",sub:"전체 평균 "+avgOpM+"% (영업)",c:""},
+    {l:"부채비율",v:hs.debt.toFixed(1)+"%",sub:"전체 평균 "+(data.reduce((s,d)=>s+d.debt,0)/data.length).toFixed(1)+"%",c:""},
+    {l:"이자보상배율",v:hs.ic.toFixed(1)+"배",sub:"1배 이상 양호",c:hs.ic>=1?"t":"r"},
+  ].map(k=>`<div class="kcard"><div class="kl">${k.l}</div><div class="kv ${k.c}">${k.v}</div><span class="kbadge nt">${k.sub}</span></div>`).join("");
+
+  const names=sel.map(d=>d.name);
+  const colors=sel.map(d=>d.isHS?"rgba(232,160,32,.9)":"rgba(59,130,246,.6)");
+  document.getElementById("peerCharts").innerHTML=`
+    <div class="ccard"><div class="ctitle">영업이익률 비교</div><div class="csub">선택 회사 · % · 황금색=한신공영</div><div class="cwrap" style="height:240px"><canvas id="pc_opM"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">원가율 비교</div><div class="csub">선택 회사 · %</div><div class="cwrap" style="height:240px"><canvas id="pc_costR"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">부채비율 비교</div><div class="csub">선택 회사 · %</div><div class="cwrap" style="height:240px"><canvas id="pc_debt"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">순이익률 비교</div><div class="csub">선택 회사 · %</div><div class="cwrap" style="height:240px"><canvas id="pc_npM"></canvas></div></div>
+  `;
+  requestAnimationFrame(()=>{
+    mkPeerBar("pc_opM",names,sel.map(d=>d.opM),colors,"%",1);
+    mkPeerBar("pc_costR",names,sel.map(d=>d.costR),sel.map(d=>d.isHS?"rgba(232,160,32,.9)":"rgba(232,72,90,.5)"),"%",1);
+    mkPeerBar("pc_debt",names,sel.map(d=>d.debt),sel.map(d=>d.isHS?"rgba(232,160,32,.9)":"rgba(139,92,246,.5)"),"%",1);
+    mkPeerBar("pc_npM",names,sel.map(d=>d.npM),colors,"%",1);
+  });
+
+  document.getElementById("peerTableTitle").textContent=title;
+  const hdr=`<tr>
+    <th style="text-align:left">순위</th><th style="text-align:left">회사명</th>
+    <th>매출액(억)</th><th>원가율</th><th>영업이익률</th><th>순이익률</th>
+    <th>이자보상배율</th><th>부채비율</th><th>유동비율</th><th>차입금의존도</th>
+  </tr>`;
+  const rows=data.slice().sort((a,b)=>a.rank-b.rank).map(d=>{
+    const style=d.isHS?"style='background:rgba(30,90,168,0.08)'":'';
+    return`<tr ${style}>
+      <td class="td-rank">${d.rank}위</td>
+      <td style="text-align:left;font-weight:${d.isHS?700:500};color:${d.isHS?"var(--hs-blue)":"var(--text)"}">${d.isHS?"🔵 ":""}${d.name}</td>
+      <td>${fmtN(d.sales)}</td>
+      <td class="${d.costR<88?"tg":d.costR>95?"tr":""}">${d.costR.toFixed(1)}%</td>
+      <td class="${d.opM>=5?"tg":d.opM<0?"tr":""}">${d.opM.toFixed(1)}%</td>
+      <td class="${d.npM>=3?"tg":d.npM<0?"tr":""}">${d.npM.toFixed(1)}%</td>
+      <td class="${d.ic>=2?"tg":d.ic<1?"tr":""}">${d.ic.toFixed(1)}배</td>
+      <td class="${d.debt<150?"tg":d.debt>300?"tr":""}">${d.debt.toFixed(1)}%</td>
+      <td class="${d.cur>=120?"tg":d.cur<100?"tr":""}">${d.cur.toFixed(1)}%</td>
+      <td>${d.depR.toFixed(1)}%</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("peerTable").innerHTML=hdr+rows;
+}
+
+function mkPeerBar(id,lbs,data,colors,unit,dec=0){
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  const c=document.getElementById(id);if(!c)return;
+  CH[id]=new Chart(c,{type:"bar",
+    data:{labels:lbs,datasets:[{data,backgroundColor:colors,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.raw.toFixed(dec)+unit}}},
+      scales:{
+        x:{...GS.x,ticks:{...GS.x.ticks,callback:v=>v.toFixed(dec)+unit}},
+        y:{grid:{display:false},ticks:{color:"#8898b8",font:{size:10}}}
+      },animation:{duration:400}}});
+}
+</script>
+</body>
+</html>
