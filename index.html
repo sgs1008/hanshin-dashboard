@@ -430,7 +430,8 @@ footer{
   <div class="ph"><h2>한신공영 재무실적</h2><p>IR자료 기준 · 단위: 억원 / 비율은 %</p></div>
   <div class="ptabs" id="fTabs">
     <button class="ptab on" onclick="setFin('y2025',this)">📋 2025년 연간 실적</button>
-    <button class="ptab"    onclick="setFin('q2026',this)">🆕 2026년 1분기 실적</button>
+    <button class="ptab"    onclick="setFin('q2026q1',this)">2026년 1분기 실적</button>
+    <button class="ptab"    onclick="setFin('q2026q2',this)">🆕 2026년 2분기 실적</button>
   </div>
   <div id="fContent"></div>
 </div>
@@ -694,7 +695,7 @@ function renderProd(s){
 /* ══════════════════════════════════════
    재무실적 — IR자료 수치만 사용
    ① 2025년 IR (연결/별도)
-   ② 2026년 1Q IR (연결/별도)
+   ② 2026년 1Q·2Q IR (연결/별도)
 ══════════════════════════════════════ */
 const FIN={
   y2025:{
@@ -706,7 +707,8 @@ const FIN={
     backlog:{total:73098,pub:23714,pub_pct:32.4,priv:49385,priv_pct:67.6,detail:[{name:"공공건축",val:9052,pct:12.4},{name:"공공토목",val:13706,pct:18.7},{name:"해외",val:956,pct:1.3},{name:"민간개발",val:9788,pct:13.4},{name:"도시정비",val:39597,pct:54.2}]},
     outlook:{sales_yrs:["2026","2027","2028","2029"],sales:[11465,16065,17943,23450],op_yrs:["2025","2026","2027","2028"],op:[680,780,1039,1616]}
   },
-  q2026:{
+  q2026q1:{
+    period:"1Q",
     con_pl:{yrs:["2025년 1Q","2026년 1Q"],sales:[3045,2524],costR:[86.26,86.26],sg:[254,153],op:[165,193],opM:[5.41,7.66],np:[40,123],npM:[1.32,4.88],yoy:{sales:"△17.11%",op:"+17.50%",opM:"+2.26%p",np:"+205.87%",npM:"+3.56%p"}},
     con_bs:{yrs:["2025년","2026년 1Q"],asset:[22130,22351],cur_asset:[12189,12377],ncur_asset:[9941,9974],debt:[13715,13822],loan:[7407,7305],equity:[8415,8529],equity_cap:[579,579],debtR:[162.99,162.06],highlights:{cash:2262,icR:1.7,curR:130.6,pfGuarantee:839}},
     sep_pl:{yrs:["2025년 1Q","2026년 1Q"],sales:[2925,2473],costR:[87.83,88.13],sg:[177,117],op:[178,177],opM:[6.10,7.15],np:[94,158],npM:[3.23,6.40],yoy:{sales:"△15.46%",op:"△1.01%",opM:"+1.04%p",np:"+67.68%",npM:"+3.17%p"}},
@@ -714,6 +716,16 @@ const FIN={
     loan_detail:{yrs:["2023","2024","2025","2026.1Q"],st_gen:[930,1375,1438,1282],st_cur:[1131,1086,894,1363],st_bond:[1849,1145,777,1072],st_tot:[3910,3606,3109,3717],lt_gen:[1598,636,1206,879],lt_bond:[741,599,1241,972],lt_tot:[2339,1235,2447,1821],total:[6249,4841,5556,5538],pf:[2634,2410,997,839]},
     backlog:{total:71179,pub:23224,pub_pct:32.6,priv:47955,priv_pct:67.4,detail:[{name:"공공건축",val:8891,pct:12.5},{name:"공공토목",val:13438,pct:18.9},{name:"해외",val:895,pct:1.3},{name:"민간개발",val:8542,pct:12.0},{name:"도시정비",val:39413,pct:55.4}]},
     ebitda:[{yr:"2023",val:1.9},{yr:"2024",val:3.1},{yr:"2025",val:6.0},{yr:"2026.1Q",val:8.2}],
+    outlook:{sales_yrs:["2026","2027","2028","2029"],sales:[11465,16065,17943,23450],op_yrs:["2026","2027","2028","2029"],op:[680,780,1039,1616]}
+  },
+  q2026q2:{
+    period:"2Q",
+    con_pl:{yrs:["2025년 2Q","2026년 2Q"],sales:[6047,5113],costR:[86.36,84.57],sg:[483,391],op:[342,398],opM:[5.65,7.79],np:[76,312],npM:[1.26,6.11],yoy:{sales:"△15.44%",op:"+16.58%",opM:"+2.14%p",np:"+308.45%",npM:"+4.84%p"}},
+    con_bs:{yrs:["2025년","2026년 2Q"],asset:[22130,22906],cur_asset:[12189,12904],ncur_asset:[9941,10002],debt:[13715,14189],loan:[7407,8016],equity:[8415,8717],equity_cap:[579,579],debtR:[162.99,162.76],highlights:{cash:2692,icR:1.8,curR:132.6,pfGuarantee:719}},
+    sep_pl:{yrs:["2025년 2Q","2026년 2Q"],sales:[5714,5038],costR:[88.44,86.45],sg:[348,313],op:[312,369],opM:[5.46,7.33],np:[141,407],npM:[2.47,8.07],yoy:{sales:"△11.83%",op:"+18.29%",opM:"+1.87%p",np:"+188.26%",npM:"+5.60%p"}},
+    sep_bs:{yrs:["2025년","2026년 2Q"],asset:[19301,20285],cur_asset:[9007,9946],ncur_asset:[10294,10339],debt:[11010,11599],loan:[5556,6045],equity:[8290,8686],equity_cap:[579,579],debtR:[132.81,133.55],highlights:{cash:2385,icR:2.1,curR:121.0,pfGuarantee:719}},
+    loan_detail:{yrs:["2023","2024","2025","2026.2Q"],st_gen:[930,1375,1438,1380],st_cur:[1131,1086,894,1567],st_bond:[1849,1145,777,1075],st_tot:[3910,3606,3109,4022],lt_gen:[1598,636,1206,1079],lt_bond:[741,599,1241,944],lt_tot:[2339,1235,2447,2023],total:[6249,4841,5556,6045],pf:[2634,2410,997,719]},
+    backlog:{total:70026,pub:23720,pub_pct:33.9,priv:46306,priv_pct:66.1,detail:[{name:"공공건축",val:8629,pct:12.3},{name:"공공토목",val:14276,pct:20.4},{name:"해외",val:815,pct:1.2},{name:"민간개발",val:6838,pct:10.4},{name:"도시정비",val:39048,pct:55.8}]},
     outlook:{sales_yrs:["2026","2027","2028","2029"],sales:[11465,16065,17943,23450],op_yrs:["2026","2027","2028","2029"],op:[680,780,1039,1616]}
   }
 };
@@ -748,25 +760,25 @@ function renderFinDetail(){
 
   /* KPI */
   const kpis=[
-    {l:"매출액",       v:fmtN(pl.sales[L])+"억",    b:pl.sales[L]-pl.sales[0],   u:"억",  inv:false},
-    {l:"영업이익",     v:fmtN(pl.op[L])+"억",       b:pl.op[L]-pl.op[0],         u:"억",  inv:false,c:"t"},
-    {l:"영업이익률",   v:pl.opM[L].toFixed(2)+"%",   b:pl.opM[L]-pl.opM[0],       u:"%p",  inv:false,c:"t"},
-    {l:"당기순이익",   v:fmtN(pl.np[L])+"억",       b:pl.np[L]-pl.np[0],         u:"억",  inv:false,c:pl.np[L]>=0?"":"r"},
-    {l:"순이익률",     v:pl.npM[L].toFixed(2)+"%",   b:pl.npM[L]-pl.npM[0],       u:"%p",  inv:false},
-    {l:"원가율",       v:pl.costR[L].toFixed(2)+"%", b:pl.costR[L]-pl.costR[0],   u:"%p",  inv:true},
-    {l:"부채비율",     v:bs.debtR[L].toFixed(2)+"%", b:bs.debtR[L]-bs.debtR[0],   u:"%p",  inv:true},
+    {l:"매출액",       v:fmtN(pl.sales[L])+"억",    b:pl.sales[L]-pl.sales[0],   u:"억",  inv:false,cmp:isY?"전년대비":"전년동기"},
+    {l:"영업이익",     v:fmtN(pl.op[L])+"억",       b:pl.op[L]-pl.op[0],         u:"억",  inv:false,c:"t",cmp:isY?"전년대비":"전년동기"},
+    {l:"영업이익률",   v:pl.opM[L].toFixed(2)+"%",   b:pl.opM[L]-pl.opM[0],       u:"%p",  inv:false,c:"t",cmp:isY?"전년대비":"전년동기"},
+    {l:"당기순이익",   v:fmtN(pl.np[L])+"억",       b:pl.np[L]-pl.np[0],         u:"억",  inv:false,c:pl.np[L]>=0?"":"r",cmp:isY?"전년대비":"전년동기"},
+    {l:"순이익률",     v:pl.npM[L].toFixed(2)+"%",   b:pl.npM[L]-pl.npM[0],       u:"%p",  inv:false,cmp:isY?"전년대비":"전년동기"},
+    {l:"원가율",       v:pl.costR[L].toFixed(2)+"%", b:pl.costR[L]-pl.costR[0],   u:"%p",  inv:true,cmp:isY?"전년대비":"전년동기"},
+    {l:"부채비율",     v:bs.debtR[L].toFixed(2)+"%", b:bs.debtR[L]-bs.debtR[0],   u:"%p",  inv:true,cmp:isY?"전년대비":"전년말대비"},
     {l:"이자보상배율", v:hl.icR.toFixed(1)+"배",     b:null, x:hl.icR>=1?"양호":"주의", c:hl.icR>=1?"t":"r"},
-    {l:"현금성자산",   v:fmtN(hl.cash)+"억",        b:null, x:isY?"25년말":"26년1Q말",c:"b"},
+    {l:"현금성자산",   v:fmtN(hl.cash)+"억",        b:null, x:isY?"25년말":`26년${d.period}말`,c:"b"},
     {l:"PF보증 잔액",  v:fmtN(hl.pfGuarantee)+"억",b:null, x:"지속 감소",c:""},
   ];
   const kpiH=kpis.map(k=>{
     const up=k.inv?k.b<=0:k.b>=0;
-    return`<div class="kcard"><div class="kl">${k.l}</div><div class="kv ${k.c||""}" style="font-size:20px">${k.v}</div>${k.b!==null?`<span class="kbadge ${up?"up":"dn"}">${up?"▲":"▼"} ${Math.abs(k.b).toFixed(2)}${k.u} 전기비</span>`:`<span class="kbadge nt">${k.x}</span>`}</div>`;
+    return`<div class="kcard"><div class="kl">${k.l}</div><div class="kv ${k.c||""}" style="font-size:20px">${k.v}</div>${k.b!==null?`<span class="kbadge ${up?"up":"dn"}">${up?"▲":"▼"} ${Math.abs(k.b).toFixed(2)}${k.u} ${k.cmp}</span>`:`<span class="kbadge nt">${k.x}</span>`}</div>`;
   }).join("");
 
   /* 전년동기 배지 */
   const yoyBadge=!isY&&pl.yoy?`<div class="fn">📊 <b>전년 동기 대비</b> &nbsp; 매출 <b>${pl.yoy.sales}</b> &nbsp;|&nbsp; 영업이익 <b>${pl.yoy.op}</b> &nbsp;|&nbsp; 영업이익률 <b>${pl.yoy.opM}</b> &nbsp;|&nbsp; 순이익 <b>${pl.yoy.np}</b> &nbsp;|&nbsp; 순이익률 <b>${pl.yoy.npM}</b></div>`
-    :`<div class="fn">📌 출처: 한신공영 IR자료 (INVESTOR RELATIONS ${isY?"2024·2025 4Q":"2025·2026 1Q"}) · ${label} · 단위: 억원</div>`;
+    :`<div class="fn">📌 출처: 한신공영 IR자료 (INVESTOR RELATIONS ${isY?"2024·2025 4Q":`2025·2026 ${d.period}`}) · ${label} · 단위: 억원</div>`;
 
   /* 손익 테이블 */
   const plR=[
@@ -811,14 +823,14 @@ function renderFinDetail(){
   /* 수주잔고 */
   const bk=d.backlog;
   const bkH=`<div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:0;">
-    <div class="kcard"><div class="kl">수주잔고 합계</div><div class="kv b" style="font-size:20px">${(bk.total/10000).toFixed(1)}조원</div><span class="kbadge nt">${isY?"25년 공시기준":"26년 1Q 공시"}</span></div>
+    <div class="kcard"><div class="kl">수주잔고 합계</div><div class="kv b" style="font-size:20px">${(bk.total/10000).toFixed(1)}조원</div><span class="kbadge nt">${isY?"25년 공시기준":`26년 ${d.period} 공시`}</span></div>
     <div class="kcard"><div class="kl">공공</div><div class="kv" style="font-size:18px">${fmtN(bk.pub)}억</div><span class="kbadge nt">${bk.pub_pct}%</span></div>
     <div class="kcard"><div class="kl">민간</div><div class="kv t" style="font-size:18px">${fmtN(bk.priv)}억</div><span class="kbadge nt">${bk.priv_pct}%</span></div>
     ${bk.detail.map(x=>`<div class="kcard"><div class="kl">${x.name}</div><div class="kv" style="font-size:16px">${fmtN(x.val)}억</div><span class="kbadge nt">${x.pct}%</span></div>`).join("")}
   </div>`;
 
-  /* EBITDA (1Q26) */
-  const ebitdaSec=!isY?`<div class="tcard"><h3>EBITDA Margin 추이 (연결기준)</h3>
+  /* EBITDA (자료에 값이 있는 기간만 노출) */
+  const ebitdaSec=d.ebitda?.length?`<div class="tcard"><h3>EBITDA Margin 추이 (연결기준)</h3>
     <div class="cgrid" style="grid-template-columns:1fr 1fr;margin-bottom:0;">
       <table><tr><th style="text-align:left">구분</th>${d.ebitda.map(e=>`<th>${e.yr}</th>`).join("")}</tr>
       <tr><td>EBITDA Margin</td>${d.ebitda.map(e=>`<td class="tg">${e.val}%</td>`).join("")}</tr></table>
@@ -862,7 +874,7 @@ function renderFinDetail(){
     ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:"#6e6e73",font:{size:11},boxWidth:12}}},scales:{x:GS.x,y:GS.y},animation:{duration:500}}});
     mkLine("fc3",bs.yrs,bs.debtR,"#e8485a","%",2,80);
     mkLine("fc4",ot.sales_yrs,isY?ot.sales:ot.op,"#e8a020","억");
-    if(!isY&&document.getElementById("febitda")) mkLine("febitda",d.ebitda.map(e=>e.yr),d.ebitda.map(e=>e.val),"#f5b942","%",1,0);
+    if(d.ebitda?.length&&document.getElementById("febitda")) mkLine("febitda",d.ebitda.map(e=>e.yr),d.ebitda.map(e=>e.val),"#f5b942","%",1,0);
   });
 }
 
