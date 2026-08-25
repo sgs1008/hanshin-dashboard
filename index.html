@@ -442,6 +442,7 @@ footer{
   <div class="ptabs" id="peerTabs">
     <button class="ptab on" onclick="setPeerPeriod('y2025',this)">2025년 연간 실적</button>
     <button class="ptab" onclick="setPeerPeriod('q2026q1',this)">2026년 1분기 실적</button>
+    <button class="ptab" onclick="setPeerPeriod('q2026q2',this)">🆕 2026년 2분기 실적</button>
   </div>
   <div class="tcard" style="padding:16px 20px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -1197,9 +1198,48 @@ const PEER_Q2026Q1=[
   {rank:50, name:"서한",       isHS:false,sales:1053, costR:85.8,opM:5.9, npM:-0.7,ic:1.3,  debt:134.7,cur:276.1,depR:39.2},
   {rank:26, name:"한신공영",   isHS:true, sales:2473, costR:88.1,opM:7.1, npM:6.4, ic:2.0,  debt:134.6,cur:116.0,depR:28.0},
 ];
+const PEER_Q2026Q2=[
+  {rank:2,  name:"현대건설",      isHS:false,sales:75314,costR:94.0,opM:2.4, npM:3.7, ic:4.6,  debt:107.7,cur:159.7,depR:11.2},
+  {rank:3,  name:"GS건설",       isHS:false,sales:29508,costR:88.8,opM:0.3, npM:-0.0,ic:0.1, debt:181.4,cur:80.1, depR:28.1},
+  {rank:4,  name:"현대엔지니어링",isHS:false,sales:44961,costR:89.8,opM:3.2, npM:3.5, ic:2.8,  debt:189.6,cur:123.1,depR:20.4},
+  {rank:5,  name:"대우건설",      isHS:false,sales:35618,costR:81.4,opM:12.7,npM:9.6, ic:5.3,  debt:326.1,cur:171.7,depR:32.0},
+  {rank:6,  name:"DL이앤씨",     isHS:false,sales:22387,costR:83.4,opM:8.0, npM:8.7, ic:15.1, debt:73.4, cur:129.7,depR:6.0},
+  {rank:7,  name:"롯데건설",      isHS:false,sales:32792,costR:90.2,opM:5.3, npM:0.9, ic:1.9,  debt:160.2,cur:140.6,depR:32.3},
+  {rank:8,  name:"포스코이앤씨",  isHS:false,sales:33706,costR:90.7,opM:2.7, npM:1.8, ic:1.9,  debt:176.7,cur:148.0,depR:24.9},
+  {rank:9,  name:"SK에코플랜트",  isHS:false,sales:43346,costR:94.0,opM:-2.4,npM:-4.4,ic:-0.9, debt:283.0,cur:75.7, depR:39.1},
+  {rank:10, name:"HDC현산",      isHS:false,sales:15612,costR:80.8,opM:13.0,npM:8.9, ic:7.2,  debt:114.9,cur:165.8,depR:24.3},
+  {rank:14, name:"계룡건설",      isHS:false,sales:10949,costR:85.5,opM:10.3,npM:7.2, ic:26.2, debt:152.2,cur:121.7,depR:23.5},
+  {rank:16, name:"서희건설",      isHS:false,sales:3972, costR:84.8,opM:10.0,npM:41.7,ic:103.8,debt:36.7, cur:321.1,depR:1.3},
+  {rank:21, name:"KCC건설",      isHS:false,sales:7358, costR:82.3,opM:5.0, npM:3.4, ic:3.7,  debt:153.0,cur:124.2,depR:25.3},
+  {rank:23, name:"코오롱글로벌",  isHS:false,sales:13761,costR:87.8,opM:5.4, npM:3.1, ic:2.1,  debt:303.8,cur:83.4, depR:29.6},
+  {rank:24, name:"태영건설",      isHS:false,sales:6880, costR:88.5,opM:7.6, npM:-1.3,ic:5.1,  debt:353.8,cur:81.3, depR:16.3},
+  {rank:25, name:"동부건설",      isHS:false,sales:9698, costR:90.5,opM:1.9, npM:2.9, ic:2.3,  debt:196.8,cur:115.4,depR:27.3},
+  {rank:26, name:"두산건설",      isHS:false,sales:7645, costR:84.8,opM:9.5, npM:6.4, ic:3.3,  debt:433.9,cur:91.7, depR:22.8},
+  {rank:27, name:"금호건설",      isHS:false,sales:9308, costR:93.3,opM:2.9, npM:2.4, ic:5.9,  debt:393.3,cur:88.8, depR:9.3},
+  {rank:28, name:"HL D&I",       isHS:false,sales:7802, costR:87.3,opM:4.9, npM:2.3, ic:1.8,  debt:219.0,cur:124.1,depR:31.6},
+  {rank:29, name:"한신공영",      isHS:true, sales:5038, costR:86.4,opM:7.3, npM:8.1, ic:2.1,  debt:133.5,cur:121.0,depR:29.8},
+  {rank:32, name:"BS한양",       isHS:false,sales:7616, costR:80.8,opM:12.7,npM:8.6, ic:5.5,  debt:166.3,cur:105.8,depR:31.2},
+  {rank:37, name:"동원개발",      isHS:false,sales:1443, costR:87.4,opM:5.1, npM:8.3, ic:72.6, debt:36.9, cur:374.4,depR:15.5},
+  {rank:43, name:"진흥기업",      isHS:false,sales:4039, costR:92.4,opM:2.9, npM:2.5, ic:77.9, debt:121.9,cur:220.9,depR:2.4},
+  {rank:45, name:"에스지씨이앤씨",isHS:false,sales:3585, costR:91.4,opM:1.1, npM:3.7, ic:0.3,  debt:219.2,cur:92.0, depR:40.2},
+  {rank:48, name:"HS화성",       isHS:false,sales:1480, costR:91.0,opM:-1.9,npM:4.0, ic:-0.7, debt:70.4, cur:151.2,depR:25.9},
+  {rank:49, name:"서한",         isHS:false,sales:2529, costR:81.4,opM:11.3,npM:7.4, ic:3.0,  debt:125.2,cur:275.9,depR:38.2},
+  {rank:50, name:"엘티삼보",      isHS:false,sales:4168, costR:89.4,opM:6.7, npM:5.6, ic:20.7, debt:104.1,cur:147.9,depR:8.5},
+];
 
 let curPeerPeriod="y2025";
 let selPeers=new Set();
+
+function getPeerData(){
+  if(curPeerPeriod==="q2026q1")return PEER_Q2026Q1;
+  if(curPeerPeriod==="q2026q2")return PEER_Q2026Q2;
+  return PEER_Y2025;
+}
+function getPeerTitle(){
+  if(curPeerPeriod==="q2026q1")return "2026년 1분기 실적 (별도 기준)";
+  if(curPeerPeriod==="q2026q2")return "2026년 2분기 실적 (별도 기준 · 상반기 누계)";
+  return "2025년 연간 실적 (별도 기준)";
+}
 
 /* ★ FIX: 기간 전환 시 selPeers 완전 초기화 후 재구성 */
 function setPeerPeriod(p,btn){
@@ -1211,14 +1251,14 @@ function setPeerPeriod(p,btn){
 }
 
 function initPeer(){
-  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
-  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+  const data=getPeerData();
+  const title=getPeerTitle();
 
   // 한신공영 항상 선택
   data.filter(d=>d.isHS).forEach(d=>selPeers.add(d.name));
 
   /* ★ FIX: selPeers가 한신공영만인 경우 기본 선택 추가 (항상 실행) */
-  const defaultRanks=[2,4,5,10,15,29];
+  const defaultRanks=[2,4,5,10,14,15,29];
   defaultRanks.forEach(r=>{
     const d=data.find(x=>x.rank===r);
     if(d) selPeers.add(d.name);
@@ -1238,17 +1278,17 @@ function initPeer(){
 }
 
 function togglePeer(name,el){
-  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
+  const data=getPeerData();
   const d=data.find(x=>x.name===name);
   if(d&&d.isHS)return;
   if(selPeers.has(name)){selPeers.delete(name);el.classList.remove("on");}
   else{selPeers.add(name);el.classList.add("on");}
-  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+  const title=getPeerTitle();
   renderPeer(data,title);
 }
 
 function peerSelAll(flag){
-  const data=curPeerPeriod==="y2025"?PEER_Y2025:PEER_Q2026Q1;
+  const data=getPeerData();
   if(flag){data.forEach(d=>selPeers.add(d.name));}
   else{selPeers=new Set();data.filter(d=>d.isHS).forEach(d=>selPeers.add(d.name));}
   document.querySelectorAll("#peerCheckboxes .peer-chk").forEach(el=>{
@@ -1256,7 +1296,7 @@ function peerSelAll(flag){
     const d=data.find(x=>x.name===nm);
     if(d){if(selPeers.has(d.name))el.classList.add("on");else el.classList.remove("on");}
   });
-  const title=curPeerPeriod==="y2025"?"2025년 연간 실적 (별도 기준)":"2026년 1분기 실적 (별도 기준)";
+  const title=getPeerTitle();
   renderPeer(data,title);
 }
 
