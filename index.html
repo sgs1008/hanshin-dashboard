@@ -127,6 +127,7 @@ nav{display:flex;gap:1px;margin-left:20px;}
 }
 .nb:hover{background:rgba(0,0,0,0.05);color:var(--text);}
 .nb.on{background:rgba(0,113,227,0.1);color:var(--blue);font-weight:600;}
+.nav-link{display:inline-flex;align-items:center;text-decoration:none;font-family:inherit;}
 .logout{
   padding:5px 13px;background:transparent;
   border:1px solid var(--border);border-radius:8px;
@@ -155,6 +156,7 @@ nav{display:flex;gap:1px;margin-left:20px;}
 }
 .mob-nb:hover{background:rgba(0,0,0,0.05);color:var(--text);}
 .mob-nb.on{background:rgba(0,113,227,0.1);color:var(--blue);font-weight:600;}
+.mob-nav .nav-link{width:100%;}
 
 /* ── LAYOUT ── */
 .wrap{max-width:1380px;margin:0 auto;padding:28px;}
@@ -304,6 +306,10 @@ footer{
   border-top:1px solid var(--border);margin-top:28px;letter-spacing:.3px;
 }
 
+@media(max-width:1120px){
+  nav{display:none;}
+  .mob-menu-btn{display:flex;align-items:center;}
+}
 @media(max-width:900px){
   .cgrid{grid-template-columns:1fr;}
   header{padding:0 14px;}
@@ -392,6 +398,7 @@ footer{
       <button class="nb" onclick="gp('finance',this)">💹 한신공영 재무실적</button>
       <button class="nb" onclick="gp('peer',this)">🏗️ 동업타사 경영실적</button>
       <button class="nb" onclick="gp('history',this)">📅 주요 경영변천사</button>
+      <a class="nb nav-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer" title="수주심의 분석시스템 새 창 열기">🏢 수주·사업성 분석</a>
     </nav>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -406,6 +413,7 @@ footer{
   <button class="mob-nb" onclick="gp('finance',this,true)">💹 한신공영 재무실적</button>
   <button class="mob-nb" onclick="gp('peer',this,true)">🏗️ 동업타사 경영실적</button>
   <button class="mob-nb" onclick="gp('history',this,true)">📅 주요 경영변천사</button>
+  <a class="mob-nb nav-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer">🏢 수주·사업성 분석 <span style="margin-left:auto;color:var(--text3)">↗</span></a>
 </div>
 
 <div class="wrap">
