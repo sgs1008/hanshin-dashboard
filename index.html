@@ -76,6 +76,8 @@ body{
   transition:all .2s ease;cursor:default;
 }
 .lp-m:hover{background:#fff;box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+.lp-link{grid-column:1/-1;display:grid;grid-template-columns:38px 1fr auto;align-items:center;column-gap:10px;text-align:left;text-decoration:none;cursor:pointer;border-color:rgba(0,113,227,.22);background:linear-gradient(135deg,rgba(0,113,227,.08),rgba(52,199,89,.07));}
+.lp-link .lp-mi{grid-row:1/3;margin:0;font-size:22px;text-align:center;}.lp-link .lp-mn{font-size:13px;color:var(--blue)}.lp-link .lp-md{font-size:10.5px}.lp-open{grid-column:3;grid-row:1/3;color:var(--blue);font-size:18px;}
 .lp-mi{font-size:17px;margin-bottom:4px;}
 .lp-mn{font-size:11.5px;font-weight:600;color:var(--text);letter-spacing:-.2px;}
 .lp-md{font-size:10px;color:var(--text2);margin-top:1px;}
@@ -358,6 +360,7 @@ footer{
       <div class="lp-m"><div class="lp-mi">💹</div><div class="lp-mn">한신공영 재무실적</div><div class="lp-md">연간 · 분기 실적</div></div>
       <div class="lp-m"><div class="lp-mi">🏗️</div><div class="lp-mn">동업타사 경영실적</div><div class="lp-md">피어 비교 분석</div></div>
       <div class="lp-m"><div class="lp-mi">📅</div><div class="lp-mn">주요 경영변천사</div><div class="lp-md">연혁 타임라인</div></div>
+      <a class="lp-m lp-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer"><div class="lp-mi">🏢</div><div class="lp-mn">수주·사업성 분석</div><div class="lp-md">실거래·인구·공급 기반 수주심의 시스템</div><span class="lp-open">↗</span></a>
     </div>
     <hr class="lp-hr">
     <div class="lp-lb">비밀번호</div>
