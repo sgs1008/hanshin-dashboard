@@ -679,8 +679,8 @@ tr:hover td{background:#f1f5fa!important;}
       <button class="nb" data-code="02" onclick="gp('finance',this)">한신공영 재무실적</button>
       <button class="nb" data-code="03" onclick="gp('peer',this)">동업타사 경영실적</button>
       <button class="nb" data-code="04" onclick="gp('history',this)">주요 경영변천사</button>
-      <a class="nb nav-link" data-code="05" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" onclick="return openProtectedSystem(event,'bid-review')" title="수주심의 분석시스템 새 창 열기">수주·사업성 분석</a>
-      <a class="nb nav-link" data-code="06" href="https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/" onclick="return openProtectedSystem(event,'monthly-reports')" title="월별 자료실 새 창 열기">월별 자료실</a>
+      <a class="nb nav-link" data-code="05" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/dashboard-access?token=170c3fe801c3560e42fb45329c2031441c855647e4aee24f776838b5ba21734d" target="_blank" rel="noopener noreferrer" title="수주심의 분석시스템 새 창 열기">수주·사업성 분석</a>
+      <a class="nb nav-link" data-code="06" href="https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer" title="월별 자료실 새 창 열기">월별 자료실</a>
     </nav>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -695,8 +695,8 @@ tr:hover td{background:#f1f5fa!important;}
   <button class="mob-nb" onclick="gp('finance',this,true)">한신공영 재무실적</button>
   <button class="mob-nb" onclick="gp('peer',this,true)">동업타사 경영실적</button>
   <button class="mob-nb" onclick="gp('history',this,true)">주요 경영변천사</button>
-  <a class="mob-nb nav-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" onclick="return openProtectedSystem(event,'bid-review')">수주·사업성 분석 <span style="margin-left:auto;color:var(--text3)">↗</span></a>
-  <a class="mob-nb nav-link" href="https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/" onclick="return openProtectedSystem(event,'monthly-reports')">월별 자료실 <span style="margin-left:auto;color:var(--text3)">↗</span></a>
+  <a class="mob-nb nav-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/dashboard-access?token=170c3fe801c3560e42fb45329c2031441c855647e4aee24f776838b5ba21734d" target="_blank" rel="noopener noreferrer">수주·사업성 분석 <span style="margin-left:auto;color:var(--text3)">↗</span></a>
+  <a class="mob-nb nav-link" href="https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer">월별 자료실 <span style="margin-left:auto;color:var(--text3)">↗</span></a>
 </div>
 
 <div class="wrap">
@@ -775,7 +775,6 @@ const SAVED_PASSWORD_KEY="hanshin-dashboard-saved-password";
 const YRS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 let CH={};
 let APP_INITIALIZED=false;
-let ACTIVE_PASSWORD="";
 
 /* ── auth ── */
 function savedPassword(){
@@ -797,45 +796,15 @@ function showDashboard(){
 function doLogin(){
   const input=document.getElementById("pwInput");
   if(input.value===PW){
-    ACTIVE_PASSWORD=input.value;
     try{document.getElementById("savePw").checked?localStorage.setItem(SAVED_PASSWORD_KEY,input.value):clearSavedPassword();}catch{}
     showDashboard();
   }else{document.getElementById("loginErr").style.display="block";input.value="";}
 }
 function doLogout(){
-  ACTIVE_PASSWORD="";
   document.getElementById("app").style.display="none";
   document.getElementById("loginWrap").style.display="flex";
   restoreSavedPassword();
   document.getElementById("loginErr").style.display="none";
-}
-
-function openProtectedSystem(event,system){
-  event.preventDefault();
-  const password=ACTIVE_PASSWORD||savedPassword();
-  if(password!==PW){
-    doLogout();
-    return false;
-  }
-  if(system==="bid-review"){
-    const form=document.createElement("form");
-    form.method="post";
-    form.action="https://construction-bid-review.teal-zebra-3835.chatgpt.site/authenticate";
-    form.target="_blank";
-    form.rel="noopener noreferrer";
-    const input=document.createElement("input");
-    input.type="hidden";
-    input.name="password";
-    input.value=password;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-  }else{
-    window.open("https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/","_blank","noopener,noreferrer");
-  }
-  document.getElementById("mobNav").classList.remove("open");
-  return false;
 }
 
 function toggleMobNav(){
