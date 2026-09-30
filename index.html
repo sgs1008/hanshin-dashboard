@@ -444,8 +444,13 @@ button{font-family:inherit;}
   border-radius:11px;font-size:15px;font-weight:700;box-shadow:0 10px 22px rgba(36,94,166,.18);
 }
 .lp-btn:hover{background:linear-gradient(135deg,#2b6ab5,#153f6b);box-shadow:0 14px 28px rgba(36,94,166,.25);}
+.lp-save{display:flex;align-items:center;gap:8px;width:fit-content;margin-top:12px;color:#526078;font-size:13px;cursor:pointer;user-select:none;}
+.lp-save input{width:17px;height:17px;margin:0;accent-color:var(--hs-blue);}
+.lp-save span{font-weight:650;}
 .lp-err{min-height:18px;margin-top:9px;font-size:12px;}
 .lp-lock{margin-top:18px;color:var(--text3);font-size:12px;text-align:center;}
+.lp-disabled{cursor:default;}
+.lp-disabled .lp-open{font-size:11px;font-weight:750;white-space:nowrap;}
 
 /* 데스크톱: 분석용 고정 사이드레일 */
 #app{min-height:100vh;}
@@ -639,6 +644,8 @@ tr:hover td{background:#f1f5fa!important;}
       <div class="lp-m"><div class="lp-mi">02</div><div class="lp-mn">한신공영 재무실적</div><div class="lp-md">연간 · 분기 실적</div></div>
       <div class="lp-m"><div class="lp-mi">03</div><div class="lp-mn">동업타사 경영실적</div><div class="lp-md">피어 비교 분석</div></div>
       <div class="lp-m"><div class="lp-mi">04</div><div class="lp-mn">주요 경영변천사</div><div class="lp-md">연혁 타임라인</div></div>
+      <div class="lp-m lp-link lp-disabled" aria-disabled="true"><div class="lp-mi">05</div><div class="lp-mn">수주·사업성 분석</div><div class="lp-md">실거래·인구·공급 기반 수주심의 시스템</div><span class="lp-open">로그인 후 이용</span></div>
+      <div class="lp-m lp-link lp-disabled" aria-disabled="true"><div class="lp-mi">06</div><div class="lp-mn">월별 자료실</div><div class="lp-md">금융·제자료·회의자료·보고서 통합 조회</div><span class="lp-open">로그인 후 이용</span></div>
     </div>
     </section>
     <section class="login-access">
@@ -648,6 +655,7 @@ tr:hover td{background:#f1f5fa!important;}
     <hr class="lp-hr">
     <div class="lp-lb">비밀번호</div>
     <input class="lp-in" type="password" id="pwInput" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="lp-save"><input type="checkbox" id="savePw" onchange="if(!this.checked)clearSavedPassword()"><span>비밀번호 저장</span></label>
     <button class="lp-btn" onclick="doLogin()">로그인</button>
     <div class="lp-err" id="loginErr">비밀번호가 올바르지 않습니다.</div>
     <div class="lp-lock">🔒 승인된 임직원만 접근 가능</div>
@@ -763,17 +771,22 @@ tr:hover td{background:#f1f5fa!important;}
 
 <script>
 const PW="hs1001000";
-const AUTH_KEY="hanshin-dashboard-authenticated";
+const SAVED_PASSWORD_KEY="hanshin-dashboard-saved-password";
 const YRS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 let CH={};
 let APP_INITIALIZED=false;
 
 /* ── auth ── */
-function persistedLogin(){
-  try{return localStorage.getItem(AUTH_KEY)==="1";}catch{return false;}
+function savedPassword(){
+  try{return localStorage.getItem(SAVED_PASSWORD_KEY)||"";}catch{return "";}
 }
-function rememberLogin(value){
-  try{value?localStorage.setItem(AUTH_KEY,"1"):localStorage.removeItem(AUTH_KEY);}catch{}
+function clearSavedPassword(){
+  try{localStorage.removeItem(SAVED_PASSWORD_KEY);}catch{}
+}
+function restoreSavedPassword(){
+  const saved=savedPassword();
+  document.getElementById("pwInput").value=saved;
+  document.getElementById("savePw").checked=!!saved;
 }
 function showDashboard(){
   document.getElementById("loginWrap").style.display="none";
@@ -781,16 +794,16 @@ function showDashboard(){
   if(!APP_INITIALIZED){init();APP_INITIALIZED=true;}
 }
 function doLogin(){
-  if(document.getElementById("pwInput").value===PW){
-    rememberLogin(true);
+  const input=document.getElementById("pwInput");
+  if(input.value===PW){
+    try{document.getElementById("savePw").checked?localStorage.setItem(SAVED_PASSWORD_KEY,input.value):clearSavedPassword();}catch{}
     showDashboard();
-  }else{document.getElementById("loginErr").style.display="block";document.getElementById("pwInput").value="";}
+  }else{document.getElementById("loginErr").style.display="block";input.value="";}
 }
 function doLogout(){
-  rememberLogin(false);
   document.getElementById("app").style.display="none";
   document.getElementById("loginWrap").style.display="flex";
-  document.getElementById("pwInput").value="";
+  restoreSavedPassword();
   document.getElementById("loginErr").style.display="none";
 }
 
@@ -1665,7 +1678,7 @@ function mkPeerBar(id,lbs,data,colors,unit,dec=0){
       },animation:{duration:400}}});
 }
 
-if(persistedLogin()) showDashboard();
+restoreSavedPassword();
 </script>
 </body>
 </html>
