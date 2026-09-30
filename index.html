@@ -639,8 +639,6 @@ tr:hover td{background:#f1f5fa!important;}
       <div class="lp-m"><div class="lp-mi">02</div><div class="lp-mn">한신공영 재무실적</div><div class="lp-md">연간 · 분기 실적</div></div>
       <div class="lp-m"><div class="lp-mi">03</div><div class="lp-mn">동업타사 경영실적</div><div class="lp-md">피어 비교 분석</div></div>
       <div class="lp-m"><div class="lp-mi">04</div><div class="lp-mn">주요 경영변천사</div><div class="lp-md">연혁 타임라인</div></div>
-      <a class="lp-m lp-link" href="https://construction-bid-review.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer"><div class="lp-mi">05</div><div class="lp-mn">수주·사업성 분석</div><div class="lp-md">실거래·인구·공급 기반 수주심의 시스템</div><span class="lp-open">↗</span></a>
-      <a class="lp-m lp-link" href="https://hanshin-monthly-reports-2026.teal-zebra-3835.chatgpt.site/" target="_blank" rel="noopener noreferrer"><div class="lp-mi">06</div><div class="lp-mn">월별 자료실</div><div class="lp-md">금융·제자료·회의자료·보고서 통합 조회</div><span class="lp-open">↗</span></a>
     </div>
     </section>
     <section class="login-access">
@@ -765,18 +763,31 @@ tr:hover td{background:#f1f5fa!important;}
 
 <script>
 const PW="hs1001000";
+const AUTH_KEY="hanshin-dashboard-authenticated";
 const YRS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 let CH={};
+let APP_INITIALIZED=false;
 
 /* ── auth ── */
+function persistedLogin(){
+  try{return localStorage.getItem(AUTH_KEY)==="1";}catch{return false;}
+}
+function rememberLogin(value){
+  try{value?localStorage.setItem(AUTH_KEY,"1"):localStorage.removeItem(AUTH_KEY);}catch{}
+}
+function showDashboard(){
+  document.getElementById("loginWrap").style.display="none";
+  document.getElementById("app").style.display="block";
+  if(!APP_INITIALIZED){init();APP_INITIALIZED=true;}
+}
 function doLogin(){
   if(document.getElementById("pwInput").value===PW){
-    document.getElementById("loginWrap").style.display="none";
-    document.getElementById("app").style.display="block";
-    init();
+    rememberLogin(true);
+    showDashboard();
   }else{document.getElementById("loginErr").style.display="block";document.getElementById("pwInput").value="";}
 }
 function doLogout(){
+  rememberLogin(false);
   document.getElementById("app").style.display="none";
   document.getElementById("loginWrap").style.display="flex";
   document.getElementById("pwInput").value="";
@@ -1653,6 +1664,8 @@ function mkPeerBar(id,lbs,data,colors,unit,dec=0){
         y:{grid:{display:false},ticks:{color:"#8898b8",font:{size:10}}}
       },animation:{duration:400}}});
 }
+
+if(persistedLogin()) showDashboard();
 </script>
 </body>
 </html>
