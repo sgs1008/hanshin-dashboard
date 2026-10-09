@@ -1,0 +1,8 @@
+{
+  "name": "hanshin-dashboard",
+  "private": true,
+  "scripts": {
+    "check": "node --check auth.js && node scripts/security-check.mjs"
+  }
+}
+
