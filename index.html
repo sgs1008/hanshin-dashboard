@@ -626,6 +626,15 @@ tr:hover td{background:#f1f5fa!important;}
 @media(prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;}
 }
+
+.fin-table{table-layout:fixed;width:560px;min-width:560px;max-width:none;}
+.fin-table th,.fin-table td{padding:7px 10px;text-align:right;white-space:nowrap;}
+.tcard>.fin-table th:first-child,.tcard>.fin-table td:first-child{position:static;box-shadow:none;}
+.fin-table th:first-child,.fin-table td.fin-label{text-align:left;}
+.fin-table col.fin-item{width:140px;}
+.fin-table col.fin-loan-group{width:58px;}
+.fin-table col.fin-loan-item{width:82px;}
+.fin-table .fin-change{background:#f4f6f9;font-weight:700;}
 </style>
 </head>
 <body>
@@ -1114,8 +1123,21 @@ function renderFinDetail(){
     {n:"당기순이익",d:pl.np,     cls:v=>v<0?"tr":"tg"},
     {n:"순이익률",  d:pl.npM,    fmt:v=>v.toFixed(2)+"%", cls:"tg"},
   ];
-  const plTbl=`<table><tr><th style="text-align:left">손익계산서</th>${pl.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  ${plR.map(r=>`<tr><td>${r.n}</td>${r.d.map(v=>{const c=typeof r.cls==="function"?r.cls(v):r.cls||"";return`<td class="${c}">${(r.fmt||fmtN)(v)}</td>`;}).join("")}</tr>`).join("")}</table>`;
+  function comparisonTable(title, years, rows){
+    return `<table class="fin-table"><colgroup><col class="fin-item"><col span="3"></colgroup>
+    <tr><th>${title}</th>${years.map(year=>`<th>${year}</th>`).join("")}<th class="fin-change">증감</th></tr>
+    ${rows.map(row=>{
+      const cells=row.d.map(value=>{
+        const cls=typeof row.cls==="function"?row.cls(value):row.cls||"";
+        return `<td class="${cls}">${(row.fmt||fmtN)(value)}</td>`;
+      }).join("");
+      const change=row.d[1]-row.d[0];
+      const amount=row.fmt?Math.abs(change).toFixed(2)+"%p":fmtN(Math.abs(change));
+      const sign=change>0?"+":change<0?"−":"";
+      return `<tr><td class="fin-label">${row.n}</td>${cells}<td class="fin-change">${sign}${amount}</td></tr>`;
+    }).join("")}</table>`;
+  }
+  const plTbl=comparisonTable("손익계산서",pl.yrs,plR);
 
   /* 재무상태표 */
   const bsR=[
@@ -1129,23 +1151,21 @@ function renderFinDetail(){
     ...(bs.curR?[{n:"유동비율",d:bs.curR,fmt:v=>v.toFixed(1)+"%"}]:[]),
     {n:"부채비율",   d:bs.debtR,     fmt:v=>v.toFixed(2)+"%", cls:v=>v<150?"tg":v>200?"tr":""},
   ];
-  const bsTbl=`<table><tr><th style="text-align:left">재무상태표</th>${bs.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  ${bsR.map(r=>`<tr><td>${r.n}</td>${r.d.map(v=>{const c=typeof r.cls==="function"?r.cls(v):r.cls||"";return`<td class="${c}">${(r.fmt||fmtN)(v)}</td>`;}).join("")}</tr>`).join("")}</table>`;
+  const bsTbl=comparisonTable("재무상태표",bs.yrs,bsR);
 
   /* 차입금 */
   const ld=d.loan_detail;
-  const ldTbl=isQ3?`<table><tr><th>구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  ${[["단기",ld.st_tot],["장기",ld.lt_tot],["합계",ld.total]].map(([name,values])=>`<tr><td>${name}</td>${values.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>`).join("")}</table>
-  <div class="hist-note">2026년 3분기 말 PF 대출보증 잔액은 231억원입니다.</div>`:`<table><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  <tr><td rowspan="4">단기</td><td>일반</td>${ld.st_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td>유동성장기</td>${ld.st_cur.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td>회사채</td>${ld.st_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td><b>소계</b></td>${ld.st_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
-  <tr><td rowspan="3">장기</td><td>일반</td>${ld.lt_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td>회사채</td>${ld.lt_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td><b>소계</b></td>${ld.lt_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
-  <tr><td colspan="2"><b>합계</b></td>${ld.total.map(v=>`<td class="tg"><b>${fmtN(v)}</b></td>`).join("")}</tr>
-  <tr><td colspan="2">PF보증</td>${ld.pf.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr></table>`;
+  const ldTbl=isQ3?`<table class="fin-table"><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th>구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  ${[["단기",ld.st_tot],["장기",ld.lt_tot],["합계",ld.total],["PF 대출보증",[2634,2410,997,231]]].map(([name,values])=>`<tr><td class="fin-label">${name}</td>${values.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>`).join("")}</table>`:`<table class="fin-table"><colgroup><col class="fin-loan-group"><col class="fin-loan-item"><col span="4"></colgroup><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  <tr><td class="fin-label" rowspan="4">단기</td><td class="fin-label">일반</td>${ld.st_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label">유동성장기</td>${ld.st_cur.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label">회사채</td>${ld.st_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label"><b>소계</b></td>${ld.st_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td class="fin-label" rowspan="3">장기</td><td class="fin-label">일반</td>${ld.lt_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label">회사채</td>${ld.lt_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label"><b>소계</b></td>${ld.lt_tot.map(v=>`<td><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td class="fin-label" colspan="2"><b>합계</b></td>${ld.total.map(v=>`<td class="tg"><b>${fmtN(v)}</b></td>`).join("")}</tr>
+  <tr><td class="fin-label" colspan="2">PF보증</td>${ld.pf.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr></table>`;
 
   /* 수주잔고 */
   const bk=d.backlog;
@@ -1168,10 +1188,10 @@ function renderFinDetail(){
 
   /* 전망 */
   const ot=d.outlook;
-  const otTbl=`<table><tr><th style="text-align:left">구분</th>${ot.sales_yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  <tr><td>매출액 전망</td>${ot.sales.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td>영업이익 전망</td>${ot.op.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
-  <tr><td>영업이익률</td>${ot.op.map((v,i)=>`<td class="tg">${(v/ot.sales[i]*100).toFixed(1)}%</td>`).join("")}</tr></table>`;
+  const otTbl=`<table class="fin-table"><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th style="text-align:left">구분</th>${ot.sales_yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  <tr><td class="fin-label">매출액 전망</td>${ot.sales.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label">영업이익 전망</td>${ot.op.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
+  <tr><td class="fin-label">영업이익률</td>${ot.op.map((v,i)=>`<td class="tg">${(v/ot.sales[i]*100).toFixed(1)}%</td>`).join("")}</tr></table>`;
 
   el.innerHTML=`
     ${isQ3?'<div class="fn">출처 · 한신공영 2026년 3분기 IR 자료 · 금액 단위 억원</div>':""}
