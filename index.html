@@ -627,13 +627,14 @@ tr:hover td{background:#f1f5fa!important;}
   *{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;}
 }
 
-.fin-table{table-layout:fixed;width:560px;min-width:560px;max-width:none;}
-.fin-table th,.fin-table td{padding:7px 10px;text-align:right;white-space:nowrap;}
+.fin-table{table-layout:fixed;width:680px;min-width:680px;max-width:none;}
+.fin-table th,.fin-table td{padding:8px 14px;text-align:right;white-space:nowrap;}
 .tcard>.fin-table th:first-child,.tcard>.fin-table td:first-child{position:static;box-shadow:none;}
 .fin-table th:first-child,.fin-table td.fin-label{text-align:left;}
-.fin-table col.fin-item{width:140px;}
-.fin-table col.fin-loan-group{width:58px;}
-.fin-table col.fin-loan-item{width:82px;}
+.fin-table caption{caption-side:top;text-align:right;padding:0 2px 6px;color:var(--muted,#68748a);font-size:11px;}
+.fin-table col.fin-item{width:160px;}
+.fin-table col.fin-loan-group{width:66px;}
+.fin-table col.fin-loan-item{width:94px;}
 .fin-table .fin-change{background:#f4f6f9;font-weight:700;}
 </style>
 </head>
@@ -1124,7 +1125,7 @@ function renderFinDetail(){
     {n:"순이익률",  d:pl.npM,    fmt:v=>v.toFixed(2)+"%", cls:"tg"},
   ];
   function comparisonTable(title, years, rows){
-    return `<table class="fin-table"><colgroup><col class="fin-item"><col span="3"></colgroup>
+    return `<table class="fin-table"><caption>금액 단위 억원 · 비율 % · 비율 증감 %p</caption><colgroup><col class="fin-item"><col span="3"></colgroup>
     <tr><th>${title}</th>${years.map(year=>`<th>${year}</th>`).join("")}<th class="fin-change">증감</th></tr>
     ${rows.map(row=>{
       const cells=row.d.map(value=>{
@@ -1155,8 +1156,8 @@ function renderFinDetail(){
 
   /* 차입금 */
   const ld=d.loan_detail;
-  const ldTbl=isQ3?`<table class="fin-table"><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th>구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
-  ${[["단기",ld.st_tot],["장기",ld.lt_tot],["합계",ld.total],["PF 대출보증",[2634,2410,997,231]]].map(([name,values])=>`<tr><td class="fin-label">${name}</td>${values.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>`).join("")}</table>`:`<table class="fin-table"><colgroup><col class="fin-loan-group"><col class="fin-loan-item"><col span="4"></colgroup><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  const ldTbl=isQ3?`<table class="fin-table"><caption>금액 단위 억원</caption><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th>구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  ${[["단기",ld.st_tot],["장기",ld.lt_tot],["합계",ld.total],["PF 대출보증",[2634,2410,997,231]]].map(([name,values])=>`<tr><td class="fin-label">${name}</td>${values.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>`).join("")}</table>`:`<table class="fin-table"><caption>금액 단위 억원</caption><colgroup><col class="fin-loan-group"><col class="fin-loan-item"><col span="4"></colgroup><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
   <tr><td class="fin-label" rowspan="4">단기</td><td class="fin-label">일반</td>${ld.st_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
   <tr><td class="fin-label">유동성장기</td>${ld.st_cur.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
   <tr><td class="fin-label">회사채</td>${ld.st_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
@@ -1188,7 +1189,7 @@ function renderFinDetail(){
 
   /* 전망 */
   const ot=d.outlook;
-  const otTbl=`<table class="fin-table"><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th style="text-align:left">구분</th>${ot.sales_yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  const otTbl=`<table class="fin-table"><caption>금액 단위 억원 · 영업이익률 %</caption><colgroup><col class="fin-item"><col span="4"></colgroup><tr><th style="text-align:left">구분</th>${ot.sales_yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
   <tr><td class="fin-label">매출액 전망</td>${ot.sales.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
   <tr><td class="fin-label">영업이익 전망</td>${ot.op.map(v=>`<td class="tg">${fmtN(v)}</td>`).join("")}</tr>
   <tr><td class="fin-label">영업이익률</td>${ot.op.map((v,i)=>`<td class="tg">${(v/ot.sales[i]*100).toFixed(1)}%</td>`).join("")}</tr></table>`;
