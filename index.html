@@ -1136,7 +1136,7 @@ function renderFinDetail(){
   const ld=d.loan_detail;
   const ldTbl=isQ3?`<table><tr><th>구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
   ${[["단기",ld.st_tot],["장기",ld.lt_tot],["합계",ld.total]].map(([name,values])=>`<tr><td>${name}</td>${values.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>`).join("")}</table>
-  <div class="hist-note">PF 대출보증 잔액은 IR 자료 표기 기준 2026년 2분기 231억원입니다.</div>`:`<table><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
+  <div class="hist-note">2026년 3분기 말 PF 대출보증 잔액은 231억원입니다.</div>`:`<table><tr><th style="text-align:left" colspan="2">구분</th>${ld.yrs.map(y=>`<th>${y}</th>`).join("")}</tr>
   <tr><td rowspan="4">단기</td><td>일반</td>${ld.st_gen.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
   <tr><td>유동성장기</td>${ld.st_cur.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
   <tr><td>회사채</td>${ld.st_bond.map(v=>`<td>${fmtN(v)}</td>`).join("")}</tr>
