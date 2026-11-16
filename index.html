@@ -744,7 +744,8 @@ tr:hover td{background:#f1f5fa!important;}
   <div class="ptabs" id="peerTabs">
     <button class="ptab on" onclick="setPeerPeriod('y2025',this)">2025년 연간 실적</button>
     <button class="ptab" onclick="setPeerPeriod('q2026q1',this)">2026년 1분기 실적</button>
-    <button class="ptab" onclick="setPeerPeriod('q2026q2',this)">🆕 2026년 2분기 실적</button>
+    <button class="ptab" onclick="setPeerPeriod('q2026q2',this)">2026년 2분기 실적</button>
+    <button class="ptab" onclick="setPeerPeriod('q2026q3',this)">🆕 2026년 3분기 누적 실적</button>
   </div>
   <div class="tcard" style="padding:16px 20px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -1575,17 +1576,48 @@ const PEER_Q2026Q2=[
   {rank:50, name:"엘티삼보",      isHS:false,sales:4168, costR:89.4,opM:6.7, npM:5.6, ic:20.7, debt:104.1,cur:147.9,depR:8.5},
 ];
 
+const PEER_Q2026Q3=[
+  {rank:2, name:"현대건설", isHS:false, sales:111404, costR:93.8, opM:2.5, npM:2.9, ic:4.4, debt:106.3, cur:164.2, depR:13.1},
+  {rank:3, name:"GS건설", isHS:false, sales:43584, costR:87.4, opM:1.8, npM:0.5, ic:0.5, debt:162.3, cur:82.9, depR:25.1},
+  {rank:4, name:"현대엔지니어링", isHS:false, sales:65377, costR:89.6, opM:3.8, npM:3.1, ic:3.4, debt:166.4, cur:125.9, depR:18.4},
+  {rank:5, name:"대우건설", isHS:false, sales:52619, costR:80.4, opM:12.3, npM:8.2, ic:5.0, debt:301.0, cur:161.2, depR:30.0},
+  {rank:6, name:"DL이앤씨", isHS:false, sales:32534, costR:84.9, opM:6.4, npM:4.7, ic:11.7, debt:71.0, cur:126.5, depR:7.4},
+  {rank:7, name:"롯데건설", isHS:false, sales:47536, costR:89.5, opM:4.4, npM:0.7, ic:1.5, debt:155.6, cur:128.1, depR:35.1},
+  {rank:8, name:"포스코이앤씨", isHS:false, sales:50883, costR:89.8, opM:2.8, npM:1.4, ic:2.0, debt:144.3, cur:152.4, depR:20.4},
+  {rank:9, name:"SK에코플랜트", isHS:false, sales:69850, costR:92.7, opM:0.4, npM:-7.5, ic:0.1, debt:338.8, cur:66.9, depR:39.5},
+  {rank:10, name:"HDC현산", isHS:false, sales:26342, costR:79.4, opM:14.0, npM:9.7, ic:9.1, debt:117.3, cur:173.9, depR:21.2},
+  {rank:14, name:"계룡건설", isHS:false, sales:16631, costR:85.1, opM:9.7, npM:5.5, ic:21.1, debt:147.3, cur:129.1, depR:25.8},
+  {rank:16, name:"서희건설", isHS:false, sales:5554, costR:89.8, opM:2.4, npM:9.2, ic:14.2, debt:49.9, cur:231.6, depR:4.2},
+  {rank:21, name:"KCC건설", isHS:false, sales:12855, costR:87.9, opM:5.4, npM:2.7, ic:2.7, debt:235.3, cur:101.9, depR:27.2},
+  {rank:23, name:"코오롱글로벌", isHS:false, sales:21220, costR:87.4, opM:5.2, npM:2.2, ic:2.1, debt:328.8, cur:95.9, depR:32.8},
+  {rank:24, name:"태영건설", isHS:false, sales:9941, costR:89.5, opM:5.7, npM:-1.6, ic:4.0, debt:290.9, cur:83.1, depR:20.8},
+  {rank:25, name:"동부건설", isHS:false, sales:14999, costR:90.3, opM:2.0, npM:1.8, ic:1.1, debt:183.6, cur:115.8, depR:30.6},
+  {rank:26, name:"두산건설", isHS:false, sales:11416, costR:85.7, opM:8.7, npM:6.2, ic:3.1, debt:405.2, cur:102.0, depR:27.3},
+  {rank:27, name:"금호건설", isHS:false, sales:14101, costR:93.2, opM:3.0, npM:2.0, ic:6.5, debt:336.3, cur:88.4, depR:10.1},
+  {rank:28, name:"HL D&I", isHS:false, sales:12237, costR:86.1, opM:5.3, npM:2.3, ic:2.0, debt:209.5, cur:129.5, depR:33.3},
+  {rank:29, name:"한신공영", isHS:true, sales:7500, costR:85.6, opM:7.8, npM:7.7, ic:2.1, debt:128.5, cur:108.2, depR:30.1},
+  {rank:32, name:"BS한양", isHS:false, sales:12500, costR:81.5, opM:10.2, npM:6.6, ic:4.7, debt:173.6, cur:101.8, depR:27.7},
+  {rank:37, name:"동원개발", isHS:false, sales:2304, costR:87.2, opM:5.4, npM:7.0, ic:94.8, debt:39.8, cur:344.3, depR:13.7},
+  {rank:43, name:"진흥기업", isHS:false, sales:6159, costR:92.2, opM:2.6, npM:4.0, ic:70.3, debt:111.7, cur:212.4, depR:2.4},
+  {rank:45, name:"에스지씨이앤씨", isHS:false, sales:5213, costR:91.7, opM:1.0, npM:2.3, ic:0.2, debt:222.7, cur:94.8, depR:39.0},
+  {rank:48, name:"HS화성", isHS:false, sales:2409, costR:91.5, opM:-2.2, npM:1.3, ic:-0.8, debt:70.4, cur:147.5, depR:26.0},
+  {rank:49, name:"서한", isHS:false, sales:4064, costR:80.2, opM:13.0, npM:7.5, ic:3.7, debt:122.5, cur:207.3, depR:35.7},
+  {rank:50, name:"엘티삼보", isHS:false, sales:5715, costR:90.3, opM:5.4, npM:4.2, ic:92.7, debt:88.3, cur:150.2, depR:9.5},
+];
+
 let curPeerPeriod="y2025";
 let selPeers=new Set();
 
 function getPeerData(){
   if(curPeerPeriod==="q2026q1")return PEER_Q2026Q1;
   if(curPeerPeriod==="q2026q2")return PEER_Q2026Q2;
+  if(curPeerPeriod==="q2026q3")return PEER_Q2026Q3;
   return PEER_Y2025;
 }
 function getPeerTitle(){
   if(curPeerPeriod==="q2026q1")return "2026년 1분기 실적 (별도 기준)";
   if(curPeerPeriod==="q2026q2")return "2026년 2분기 실적 (별도 기준 · 상반기 누계)";
+  if(curPeerPeriod==="q2026q3")return "2026년 3분기 누적 실적 (별도 기준)";
   return "2025년 연간 실적 (별도 기준)";
 }
 
